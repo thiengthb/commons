@@ -5,6 +5,88 @@
 
 ---
 
+## 2026-07-30 — external patterns are REFERENCED, not vendored; external RULES are imported
+
+**Context:** the standing request was to find good, generic, reusable patterns _on the web_ — and the
+closing check of `plans/2026-07-29-commons-install-surface.md` had named it a MISS, because all 24 items
+so far came from this fleet's own code.
+
+**Decision — split the request in two, and answer each differently.**
+
+- **Component code from the web is never copied into this registry.** Copy-in is permanent (upstream
+  fixes never arrive); the rule of three would be inverted (a web pattern has **zero** uses here, so the
+  catalog would start predicting demand instead of recording it); and it would corrupt the 2026-08-26
+  check-in, which asks whether any _proven_ item ever got installed — padding the catalog first makes a
+  null result unreadable.
+- **Rules, configs and gates from the web ARE imported**, because grounding a standard in this agent's
+  own opinion is exactly the failure `research-before-design` exists to prevent.
+
+**Why the first half is not a refusal:** the shadcn CLI already resolves several community registries
+with **no configuration at all** — measured with `search`: `@shadcn` 471 items, `@reui` 1596,
+`@animate-ui` 580, `@aceternity` 270, `@magicui` 247, `@ai-elements` 136, `@basecn` 56, `@prompt-kit` 23.
+So an external component is one command away _on demand_, keeps its author's provenance, and leaves
+nothing dead here. What was missing was never a copy — it was knowing the namespaces exist plus a rule
+for when to reach for one. Full verdicts + the four pre-install gates: `docs/external-patterns.md`.
+
+**The uncomfortable part of the finding:** of those eight, exactly **one** (`@reui`) is a real candidate,
+and only per-item — `@reui/data-grid` pulls `@base-ui/react`, a _second_ primitive library beside Radix.
+Three of the largest are animation/marketing libraries, which this platform's own minimal-UI rule would
+require arguing back out. The ceiling on reuse here is not catalog size.
+
+**What the imported rules turned into**, each measured against the fleet _before_ being built:
+`config-editorconfig` (0 of 10 repos had one), `lib-env` (0 of 10 validated their environment),
+`test-ci-hardening` (0 of 8 workflows declared top-level `permissions`; 0 pinned any action by SHA across
+44 `uses:` sites), and capability/privilege hardening in the starter's compose.
+
+**Related:** `docs/external-patterns.md` (verdicts + sources) · `registry/test/ci-hardening.test.ts` ·
+`registry/lib/env.ts` · [[2026-07-29 — the registry carries ANY file, so installed-vs-read is the scope line]]
+
+---
+
+## 2026-07-30 — the EditorConfig/Prettier overlap makes a "harmless" config file load-bearing
+
+**Context:** adding a `.editorconfig` looked like the most trivial item in the registry.
+
+**Pitfall:** **Prettier reads `.editorconfig`.** For `endOfLine`, `tabWidth`, `useTabs` and `printWidth`,
+an option absent from `.prettierrc` is filled in from EditorConfig, while an option present there wins.
+So two configs that disagree make a file's formatting depend on whether the editor or `prettier --write`
+touched it last — the exact flip-flopping diff noise the shared Prettier config exists to eliminate.
+Shipping an EditorConfig with plausible-but-different values would have been **worse than shipping none**.
+
+**Decision:** `config-editorconfig` restates the `config-prettier` contract exactly (LF, 2 spaces, width 100) and says in the file that it must be kept in agreement. Two carve-outs are deliberate:
+`trim_trailing_whitespace = false` for Markdown (two trailing spaces are a hard line break, so trimming
+silently rewrites the document) and `indent_style = tab` where a tab is syntax, not style.
+
+**Related:** `registry/config/editorconfig.txt` · `registry/config/prettierrc.json`
+
+---
+
+## 2026-07-30 — the CI gate's first finding was in an artifact this repo had just shipped
+
+**Context:** `test-ci-hardening` was written from external guidance, then run against fixtures — one of
+which was `starter-web-app`'s own `deploy.yml`, written and reviewed earlier in the same work pass.
+
+**Finding:** it had no **top-level** `permissions:`. Only the `build` job declared any, so the `test` job —
+the one that runs `npm ci`, i.e. arbitrary dependency postinstall scripts — inherited whatever token scope
+the repository defaulted to, which on an older repo is read/write. Reviewed by a human who knew the rule,
+and still wrong, in the artifact meant to be the reference. Across the fleet: **0 of 8** workflows had it.
+
+**Why this is the argument for gates over prose, again:** this is now the second measured instance of the
+same shape (the first was the no-emoji rule, written down and broken in 14 files across three apps that
+all had the prose). A rule stated in a document is a reminder; the same rule as a failing test is the only
+version that finds the case its own author missed.
+
+**Two judgement calls recorded so they are not mistaken for facts:** `trustedOwners` exempts `actions`,
+`github` and `docker` from SHA pinning because published guidance targets _third-party_ actions and
+pinning first-party namespaces forfeits automatic patches — `"strict": true` in `docs/gates.json` takes the
+stronger position. And the fleet's own 8 workflows are **not fixed** by this: `.github/workflows/**` is
+governance the agent may not edit, so that remains a human commit.
+
+**Related:** `registry/test/ci-hardening.test.ts` · `registry/starter/github-workflows/deploy.yml` ·
+`registry/starter/docs/gates.json`
+
+---
+
 ## 2026-07-30 — a repo-layout change degraded two tools SILENTLY, in the same shape
 
 **Context:** the nine app repos moved from the repo root into `projects/`. Nothing errored. Two of the

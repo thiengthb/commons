@@ -1,7 +1,7 @@
 # commons — Map
 
-> One sentence: the fleet's shared **shadcn registry** — 24 installable artifacts (UI, helpers, configs, an ops
-> script, a rule-as-a-test, and a whole-app starter) distributed **copy-in**
+> One sentence: the fleet's shared **shadcn registry** — 27 installable artifacts (UI, helpers, configs, an ops
+> script, two rules-as-tests, and a whole-app starter) distributed **copy-in**
 > (consumers run `shadcn add` and own the code). `kind`: `meta`, `target`: `none` — NOT deployed (no Docker, no
 > CI deploy, no Traefik). Path `<repo-root>/commons`, its own git repo `thiengthb/commons`.
 
@@ -14,8 +14,12 @@ dependency). No server, no image, no pipeline.
 Scope is defined by **mechanism, not content type**: what a consumer **installs** (a file lands in their repo)
 lives here; what a consumer **reads** to decide (law, standards, catalogs) stays in `platform/`; what is enforced
 at generation time stays `rulebook`'s. So an executable rule ships as an item (`test-no-emoji`) while the prose it
-enforces does not move. The widening from 15 UI components to 24 artifacts across 7 layers was
+enforces does not move. The widening from 15 UI components to 27 artifacts across 7 layers was
 `docs/plans/2026-07-29-commons-install-surface.md` (phases 0-4 done 2026-07-30).
+
+**External** patterns are the one thing that does NOT come in here: several community shadcn registries
+resolve with no config at all, so they are referenced on demand rather than vendored. Verdicts + the four
+pre-install gates: `docs/external-patterns.md`.
 
 Only stable, product-agnostic items belong here; per-app UI stays in its app.
 
@@ -31,13 +35,13 @@ Only stable, product-agnostic items belong here; per-app UI stays in its app.
 ## 3. Module map / entry points
 
 ```
-registry.json            ROOT manifest: 15 UI items + `include` of the six layer manifests below (24 items total)
+registry.json            ROOT manifest: 15 UI items + `include` of the six layer manifests below (27 items total)
 registry/thiengthb/      the 15 UI item sources (kebab-case filenames, PascalCase exports)
-registry/lib/            lib-db — the Prisma singleton
+registry/lib/            lib-db — the Prisma singleton · lib-env — fail-fast zod env validation
 registry/script/         script-rebuild-and-verify — a UNIVERSAL item: installs into a repo with no components.json
-registry/config/         config-vitest · config-eslint · config-prettier
+registry/config/         config-vitest · config-eslint · config-prettier · config-editorconfig
 registry/block/          page-shell (the MANDATORY page frame, all slots, no next/*) · theme-toggle
-registry/test/           test-no-emoji — a platform rule shipped as a failing test
+registry/test/           test-no-emoji · test-ci-hardening — platform rules shipped as failing tests
 registry/starter/        starter-web-app — the whole web-app spine (Dockerfile, compose, CI, health, doc stubs)
 components.json          shadcn config for THIS repo (new-york, Tailwind neutral, @/ aliases)
 package.json             @thiengthb/commons, private:true — registry:build · validate · readme[:check] · audit · format[:check]
@@ -49,6 +53,8 @@ scripts/audit-consumers.mjs  where each consumer stands vs the registry: CLEAN/S
 public/r/<name>.json     BUILT output (embedded source) — committed, this is what `shadcn add` fetches
 .github/workflows/       registry.yml (validate → readme:check → build → fail if public/r is dirty)
 docs/                    00-map.md · decisions.md · divergences.json (declared, reasoned forks) · plans/
+docs/external-patterns.md  what was taken FROM the web and what was refused — the 8 zero-config community
+                         registries with per-namespace verdicts, the 4 pre-install gates, and sources
 ```
 
 Two tools live OUTSIDE this repo because they reason across the whole fleet, not about one registry:
@@ -94,6 +100,11 @@ Two tools live OUTSIDE this repo because they reason across the whole fleet, not
 - **Naming**: PascalCase React exports, **kebab-case filenames** (`date-picker.tsx`).
 - **Only product-agnostic, stable items** — the `/code-reuse` rule of three, with one exemption: an artifact
   implementing a **written platform standard** may be extracted at first use.
+- **Nothing from an external registry is ever VENDORED into here.** External components are reached on
+  demand (`npx shadcn add @reui/x` — several community namespaces resolve with no config at all) and pass
+  the four gates in `docs/external-patterns.md §2` first. A web pattern has zero uses in the fleet, so
+  copying it in inverts the rule of three. External _rules and configs_ are a different case and ARE
+  imported — `config-editorconfig`, `lib-env`, `test-ci-hardening` all came from published standards.
 - **Keep `platform/registries/shared-assets.md` in sync** in the same change when the item list changes.
 
 ## 7. Secrets / env

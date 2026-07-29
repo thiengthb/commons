@@ -3,7 +3,7 @@ title: commons — from a UI registry to the platform's INSTALL SURFACE (ui · l
 status: active # accepted 2026-07-29 by the supervisor — Option A, execute Phase 0+1 first then report before Phase 2
 kind: system-change
 created: 2026-07-29
-updated: 2026-07-30 # Phases 0-4 COMPLETE and live: reuse-scan.mjs (the counter) + reuse-guard.mjs (per-write, installed by the supervisor 2026-07-30). Only 5.1 open, and its trigger is measured-closed
+updated: 2026-07-30 # Phases 0-4 COMPLETE and live. The "và cả trên mạng" MISS is CLOSED (see the Closing check): external components are REFERENCED not vendored, external RULES imported as 3 new items — 24 → 27. Only 5.1 open, and its trigger is measured-closed
 checkin: 2026-08-26
 checkin_owner: supervisor
 related:
@@ -70,9 +70,47 @@ there and stock the registry with them" — that second reading was never execut
 second is a decision with a written reason, but it is still less than "đầy đủ": three of four process gates
 remain single-repo, and `page-shell` shipping first is what unblocks them.
 
-**Next action for the gap:** ask the supervisor which reading of "và cả trên mạng" they meant before building
-anything — importing third-party patterns into `commons` would change what the registry is for, and that is
-their call, not a detail to infer.
+### 2026-07-30 (later the same day) — the MISS is CLOSED, and the answer was not the obvious one
+
+The supervisor confirmed the second reading: _find good, generic, reusable code patterns on the web._ Asked
+for a counter-argument first, and half of one held.
+
+**What was refused, with reasons:** vendoring external component code into `commons`. Copy-in is permanent
+(upstream fixes never arrive); the rule of three would be inverted (a web pattern has **zero** uses in the
+fleet, so the catalog starts predicting demand instead of recording it); and it would corrupt the
+**2026-08-26 check-in below**, which asks whether any _proven_ item ever got installed — padding the catalog
+first makes a null result unreadable.
+
+**What replaced it — and this is the finding:** the shadcn CLI already resolves several community registries
+with **no configuration at all**. Measured with `shadcn search`: `@shadcn` 471 items, `@reui` 1596,
+`@animate-ui` 580, `@aceternity` 270, `@magicui` 247, `@ai-elements` 136, `@basecn` 56, `@prompt-kit` 23. So
+external patterns were **already one command away**; what was missing was never a copy, it was knowing the
+namespaces exist plus a rule for when to reach for one. Of the eight, exactly **one** (`@reui`) is a real
+candidate and only per-item — `@reui/data-grid` pulls `@base-ui/react`, a second primitive library beside
+Radix. Verdicts, four pre-install gates and sources: `docs/external-patterns.md`.
+
+**What was imported from the web, as rules rather than components** — each measured against the fleet first,
+which is what makes them not speculative:
+
+| From published guidance                                                                                                               | Measured gap                                                                                                  | Shipped                   |
+| ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| EditorConfig, reconciled with Prettier (Prettier _reads_ it)                                                                          | 0 of 10 repos had one                                                                                         | `config-editorconfig`     |
+| t3-env's fail-fast typed env, on plain zod                                                                                            | 0 of 10 repos validated their env                                                                             | `lib-env`                 |
+| Actions hardening (top-level `permissions`, SHA-pinned third-party actions, no `pull_request_target`, no untrusted context in `run:`) | **0 of 8** workflows had top-level `permissions`; **0 of 8** pinned any action by SHA across 44 `uses:` sites | `test-ci-hardening`       |
+| Container hardening (drop ALL caps, `no-new-privileges`, read-only rootfs)                                                            | starter had non-root `USER` and nothing else                                                                  | `starter-web-app` compose |
+
+Registry: **24 → 27 items**. All three new items were verified by running them, not by reading them — the CI
+gate against 4 fixtures with both negative controls (a 9-char `rulebook-allow` reason stops excusing;
+`strict: true` starts failing `actions/checkout@v4`), `lib-env` with `tsc` + 4 runtime behaviours, and the
+container hardening on a real image (`CapEff: 0000000000000000`, `SKIP_ENV_VALIDATION` absent at runtime).
+
+**Two things running it found that review had not:** the CI gate's first finding was in
+`starter-web-app`'s own `deploy.yml` (no top-level `permissions`, so the `npm ci` job inherited the
+repo-default token scope), and the starter Dockerfile failed outright on an app with no `public/` directory.
+
+**Still open, and NOT closed by this pass:** the SHA-pinning finding stands on all 7 app repos and
+`commons` — `.github/workflows/**` is governance the agent may not edit, so that is a human commit. And
+the second shortfall (three single-repo convention gates) is untouched.
 
 ## Goal
 
