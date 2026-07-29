@@ -1,0 +1,19 @@
+# Line endings are normalized to LF on every machine. This is load-bearing, not cosmetic.
+#
+# `shadcn build` embeds each item's SOURCE as a JSON string inside public/r/<item>.json. Every tracked
+# file here is already LF in the index, but on Windows core.autocrlf checks those blobs out as CRLF, so a
+# build there bakes \r\n INTO the embedded content string. Measured 2026-07-29: 11 of 15 artifacts carried
+# Windows-era CRLF while the 4 built on Linux did not — so the same registry handed consumers CRLF for
+# `truncate` and LF for `data-table`, and every machine switch rewrote those 11 files. `eol=lf` makes the
+# build byte-identical wherever it runs, which is what lets CI gate on `git diff --exit-code public/r`.
+* text=auto eol=lf
+
+# Shell scripts ship as registry items into other repos and run inside containers — CRLF breaks them.
+*.sh text eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.woff binary
+*.woff2 binary

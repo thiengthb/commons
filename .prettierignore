@@ -2,6 +2,11 @@ node_modules
 dist
 build
 coverage
+
+# BUILD OUTPUT — `shadcn build` owns the formatting of these files. Letting Prettier reformat them would
+# make `shadcn build` dirty the tree on every run, which breaks the CI gate (`git diff --exit-code public/r`).
+public/r
+
 .next
 *.db
 *.db-shm
