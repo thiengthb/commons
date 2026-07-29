@@ -3,7 +3,7 @@ title: commons — from a UI registry to the platform's INSTALL SURFACE (ui · l
 status: active # accepted 2026-07-29 by the supervisor — Option A, execute Phase 0+1 first then report before Phase 2
 kind: system-change
 created: 2026-07-29
-updated: 2026-07-29 # Phases 0-4 done. 4.2 delivered as TWO tools, not one: reuse-scan.mjs (the counter, installed) + a proposed reuse-guard hook (per-write, awaiting a human install). Only 5.1 open, trigger has not fired
+updated: 2026-07-30 # Phases 0-4 COMPLETE and live: reuse-scan.mjs (the counter) + reuse-guard.mjs (per-write, installed by the supervisor 2026-07-30). Only 5.1 open, and its trigger is measured-closed
 checkin: 2026-08-26
 checkin_owner: supervisor
 related:
