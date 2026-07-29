@@ -3,7 +3,7 @@ title: commons — from a UI registry to the platform's INSTALL SURFACE (ui · l
 status: active # accepted 2026-07-29 by the supervisor — Option A, execute Phase 0+1 first then report before Phase 2
 kind: system-change
 created: 2026-07-29
-updated: 2026-07-29
+updated: 2026-07-29 # Phase 0 + Phase 1 DONE and verified; next batch = Phase 2 (awaiting the go-ahead)
 checkin: 2026-08-26
 checkin_owner: supervisor
 related:
@@ -100,8 +100,13 @@ source layout uses `include` (one `registry.json` per layer folder, flattened at
   diacritics (dev artifacts are English; these strings are what `shadcn view` shows an agent).
 - **AC-6** — Given `todo` (a living consumer), When the `lib-db` item is installed, Then the file lands at `todo/lib/db.ts`
   and `npx tsc --noEmit` + `npm test` stay green.
-- **AC-7** — Given `journal`, When the **universal** `script-rebuild-and-verify` item is installed, Then the file lands at
-  `journal/scripts/rebuild-and-verify.sh` and running it reports the container healthy.
+- **AC-7** — Given a directory with **no `components.json` and no `package.json`**, When the universal
+  `script-rebuild-and-verify` item is installed, Then the file lands at `scripts/rebuild-and-verify.sh` and running it
+  against a live app reports health + every route, exiting 0 on success and 1 on a bad route.
+  _(Re-targeted 2026-07-29 during execution: the original wording named `journal`, but `journal/docker-compose.yml`
+  brings up Postgres only — the app itself runs via `next dev`, so "the container is healthy" is not a thing that repo
+  can report. A bare directory is also the stronger test of "universal", and the live-app half ran against the running
+  `sakubun` with the `--verify-only` flag added for exactly this reason: never `compose up` a public app to test a script.)_
 - **AC-8** — Given an app whose codebase violates a distributed rule, When its `test-*` gate item is installed and
   `npm test` runs, Then it fails listing exactly the offending files, and passes once they are cleaned or seeded.
 - **AC-9** — Given an empty scratch dir, When `shadcn init --template next` + `shadcn add @thiengthb/starter-web-app` +
@@ -127,36 +132,36 @@ source layout uses `include` (one `registry.json` per layer folder, flattened at
 > were built on the Windows box; Linux emits LF. Two consequences: every consumer installing today gets CRLF source
 > files, and the Phase-0.4 gate would go red on every machine switch. **0.0 must land before 0.4.**
 
-- [ ] 0.0 — Make the build machine-independent · Files: Create `.gitattributes` (`* text=auto eol=lf`, explicit
+- [x] 0.0 — Make the build machine-independent · Files: Create `.gitattributes` (`* text=auto eol=lf`, explicit
       `*.tsx`/`*.ts`/`*.json`), then `git add --renormalize .` + `shadcn build`, commit the LF artifacts ·
       Test: `AC-1` (`shadcn build` on Linux **and** on the Windows box both leave `git status public/r` clean)
-- [ ] 0.1 — Finish the `ui-kit` → `commons` rename · Files: Modify `README.md` (working tree already dirty),
+- [x] 0.1 — Finish the `ui-kit` → `commons` rename · Files: Modify `README.md` (working tree already dirty),
       `package.json`, `registry.json` (`homepage`), `docs/00-map.md` (title + `MiniServer/ui-kit` paths),
       `docs/decisions.md` (title); replace dead `nuc-platform/*` refs with `platform/standards/*` ·
       Test: `AC-4` (`grep -ri 'ui-kit\|D:\\Projects\|nuc-platform' commons` returns 0 hits)
-- [ ] 0.2 — README's item table lists **10 of 15** items (missing `app-sidebar`, `breadcrumbs`, `data-table`,
+- [x] 0.2 — README's item table lists **10 of 15** items (missing `app-sidebar`, `breadcrumbs`, `data-table`,
       `data-pagination`, `info-tooltip`) → stop hand-maintaining it · Files: Create `scripts/gen-readme.mjs`
       (generate the table from `registry.json`; `--check` mode for CI, no test runner to install) ·
       Test: `AC-3` + `AC-5` (add an item without regenerating ⇒ non-zero exit naming it)
-- [ ] 0.3 — `registry.json` item `description`s are Vietnamese → English (dev-artifact rule; these strings are what
+- [x] 0.3 — `registry.json` item `description`s are Vietnamese → English (dev-artifact rule; these strings are what
       `shadcn view` / the MCP server shows an agent in another repo) · Files: Modify `registry.json` ·
       Test: `AC-5` (the `--check` linter) + `shadcn registry validate` passes
-- [ ] 0.4 — Wire the build gate · Files: Create `.github/workflows/registry.yml` (`shadcn registry validate` →
+- [x] 0.4 — Wire the build gate · Files: Create `.github/workflows/registry.yml` (`shadcn registry validate` →
       `gen-readme --check` → `shadcn build` → `git diff --exit-code public/r`) ·
       Test: `AC-2` (push a `registry/**` change without rebuilding ⇒ CI red)
       _(this replaces the 00-map invariant "every edit ⇒ rebuild + commit", which is currently only a sentence)_
 
 ### Phase 1 — thin slice: prove a NON-UI item installs (do not build 6 layers on an unproven mechanism)
 
-- [ ] 1.1 — Add `lib-db` (`registry:lib`, file target `~/lib/db.ts`) from the 3× copy · Files: Create `registry/lib/db.ts` + `registry/lib/registry.json`, Modify root `registry.json` (`include`) ·
+- [x] 1.1 — Add `lib-db` (`registry:lib`, file target `~/lib/db.ts`) from the 3× copy · Files: Create `registry/lib/db.ts` + `registry/lib/registry.json`, Modify root `registry.json` (`include`) ·
       Test: `AC-1` (`shadcn registry validate` + `build` clean)
-- [ ] 1.2 — Install it into a living consumer · Files: `todo/lib/db.ts` (via `npx shadcn add ../commons/public/r/lib-db.json`) ·
+- [x] 1.2 — Install it into a living consumer · Files: `todo/lib/db.ts` (via `npx shadcn add ../commons/public/r/lib-db.json`) ·
       Test: `AC-6` (lands at the right path, `git diff` shows only the known comment line, `tsc --noEmit` + `npm test` green)
-- [ ] 1.3 — Add one **universal** item (no `components.json` required, explicit `target`) to prove framework-agnostic
+- [x] 1.3 — Add one **universal** item (no `components.json` required, explicit `target`) to prove framework-agnostic
       delivery · Files: Create `registry/script/rebuild-and-verify.sh` → target `~/scripts/rebuild-and-verify.sh` (from
       `sakubun/scripts/`, parameterized: app name + port + compose file from args/env, not hardcoded) ·
       Test: `AC-7` (install into `journal`, run it, container healthy)
-- [ ] 1.4 — Record the result in `docs/decisions.md` (mechanism proven / limits found) · Files: `docs/decisions.md` ·
+- [x] 1.4 — Record the result in `docs/decisions.md` (mechanism proven / limits found) · Files: `docs/decisions.md` ·
       Test: `AC-6` + `AC-7` both closed · **STOP and report before Phase 2**
 
 ### Phase 2 — extract what has already earned it (gated, not a sweep)
