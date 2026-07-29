@@ -11,8 +11,10 @@
         "@thiengthb/config-vitest",
         "@thiengthb/config-eslint",
         "@thiengthb/config-prettier",
+        "@thiengthb/config-editorconfig",
         "@thiengthb/script-rebuild-and-verify",
-        "@thiengthb/test-no-emoji"
+        "@thiengthb/test-no-emoji",
+        "@thiengthb/test-ci-hardening"
       ],
       "files": [
         {

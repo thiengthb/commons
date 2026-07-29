@@ -16,7 +16,14 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm run build
+# The build stage has no .env, so a fail-fast env module (@thiengthb/lib-env) would abort `next build`
+# on variables that only exist at run time. This is scoped to THIS stage — the runtime stage below is a
+# separate FROM and never inherits it, which is what keeps the escape hatch out of production.
+ENV SKIP_ENV_VALIDATION=1
+# The runtime stage copies ./public unconditionally, and a COPY of a missing path fails the whole
+# build. Templates that scaffold a public/ make this a no-op; an app that has none would otherwise
+# break here for a reason the error message does not explain.
+RUN mkdir -p public && npm run build
 
 # ---------- runtime ----------
 FROM node:24-alpine

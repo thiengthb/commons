@@ -3,5 +3,11 @@
   "no-emoji": {
     "roots": ["app", "components", "lib"],
     "allow": []
+  },
+  "ci-hardening": {
+    "_note": "strict:true additionally requires a commit SHA for the first-party actions/* and docker/* namespaces. Off by default because that is where the published guidance draws the line and pinning them forfeits automatic patches; turn it on to take the stronger position.",
+    "strict": false,
+    "trustedOwners": ["actions", "github", "docker"],
+    "allow": []
   }
 }

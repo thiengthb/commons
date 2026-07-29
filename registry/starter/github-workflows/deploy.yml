@@ -13,6 +13,12 @@ on:
       - 'docs/**'
   workflow_dispatch:
 
+# Least privilege by DEFAULT: without this block every job inherits the repository's default token
+# scope, which on an older repo is read/write. The `test` job runs `npm ci`, i.e. arbitrary dependency
+# postinstall scripts — it must not hold a token that can push. Jobs widen this individually.
+permissions:
+  contents: read
+
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}

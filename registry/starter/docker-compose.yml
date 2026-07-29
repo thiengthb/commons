@@ -17,6 +17,23 @@ services:
       # Secrets are read from .env (chmod 600, gitignored) — never written into this file.
     volumes:
       - app_data:/data
+    # Runtime hardening. The image already runs as the non-root `node` user; these two close the paths
+    # that let a compromised process regain what the user gave up. Both verified against this exact
+    # image: a Next standalone server needs no Linux capability (it binds 3000, not a privileged port).
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    # read_only: true is the next step up. It WORKS on this image — measured 2026-07-30 with the three
+    # lines below: container healthy, / and /api/health both 200, `echo x > /app/probe` refused, /data
+    # and the tmpfs still writable, nothing in the log. It is opt-in rather than default because it is
+    # verified against a BARE app: the first thing this starter tells you to add is Prisma, whose engine
+    # and native modules may write outside /tmp, and that failure appears at run time, not build time.
+    # Turn it on once the app's own dependencies are known, and re-verify:
+    #   read_only: true
+    #   tmpfs:
+    #     - /tmp
+    #     - /app/.next/cache   # Next's ISR + image-optimisation cache; tmpfs means it is lost on restart
 
 volumes:
   app_data:
