@@ -80,7 +80,15 @@ function registryFiles() {
   return out.sort((a, b) => a.item.localeCompare(b.item));
 }
 
-/** Sibling repos that could consume the registry: a package.json, and not this repo. */
+/**
+ * Repos that could consume the registry: a `package.json`, and not this repo.
+ *
+ * Descends TWO container levels, not one. Measured 2026-07-30, the day the app repos moved into
+ * `projects/`: with one level this found 87 of 97 installed files and silently dropped
+ * `projects/yakudoku/web` entirely — a monorepo whose root carries no `package.json`, so it needs
+ * `projects/` + `yakudoku/` + `web/`. It reported a smaller true-looking number rather than failing, which
+ * is the worse shape. Depth, not a hardcoded `projects/`, so the next reorganisation costs nothing.
+ */
 function consumers() {
   const found = [];
   const walk = (rel, depth) => {
@@ -98,9 +106,11 @@ function consumers() {
   };
   for (const entry of readdirSync(FLEET)) {
     if (entry.startsWith('.') || entry === 'node_modules') continue;
-    walk(entry, 1);
+    walk(entry, 2);
   }
-  return only.length > 0 ? found.filter((f) => only.includes(f)) : found;
+  return only.length > 0
+    ? found.filter((f) => only.some((o) => f === o || f.endsWith(`/${o}`)))
+    : found;
 }
 
 /** Every historical version of a registry source file, newest first (excluding the current one). */
@@ -152,6 +162,17 @@ const files = registryFiles();
 const rows = [];
 const counts = { CLEAN: 0, STALE: 0, FORKED: 0, DELIBERATE: 0, PROSE: 0, ADAPTED: 0 };
 const declared = declaredDivergences();
+
+/** `projects/sakubun` + `lib/db.ts` matches a key written as `sakubun::lib/db.ts`. */
+function lookupDivergence(repo, target) {
+  const exact = declared.get(`${repo}::${target}`);
+  if (exact) return exact;
+  for (const [key, reason] of declared) {
+    const [keyRepo, keyPath] = key.split('::');
+    if (keyPath === target && (repo === keyRepo || repo.endsWith(`/${keyRepo}`))) return reason;
+  }
+  return undefined;
+}
 const historyCache = new Map();
 
 for (const repo of consumers()) {
@@ -182,7 +203,11 @@ for (const repo of consumers()) {
         verdict = 'PROSE';
         detail = 'same code, comments differ';
       } else {
-        const reason = declared.get(`${repo}::${file.target}`);
+        // Keys are written with the bare project name (`sakubun::lib/db.ts`), but `repo` is the path
+        // relative to the repo root, which gained a `projects/` prefix on 2026-07-30. An exact lookup sent
+        // all four declared divergences straight back to FORKED — the record was still there, the match
+        // wasn't. Compare on the tail so a declaration outlives the next reorganisation.
+        const reason = lookupDivergence(repo, file.target);
         if (reason) {
           verdict = 'DELIBERATE';
           detail = reason.length > 60 ? `${reason.slice(0, 57)}...` : reason;
