@@ -5,6 +5,30 @@
 
 ---
 
+## 2026-07-30 — a repo-layout change degraded two tools SILENTLY, in the same shape
+
+**Context:** the nine app repos moved from the repo root into `projects/`. Nothing errored. Two of the
+tools built the day before quietly started answering a smaller version of the question:
+`reuse-scan` found **0 of 22** duplicate groups (its `projects()` read the root's immediate children), and
+`audit-consumers` found **87 of 97** installed files — dropping `projects/yakudoku/web` entirely, because a
+monorepo root carries no `package.json` and therefore needed a third level of descent. Worse,
+`audit-consumers` reported **0 of 4** declared divergences: the reasons in `docs/divergences.json` were
+still there, but keyed on the bare project name (`sakubun::lib/db.ts`) while the walker now yields
+`projects/sakubun`, so four deliberate decisions came back as FORKED.
+**Decision:** discover by SHAPE, never by a folder name. A parallel session added
+`.claude/scripts/_layout.mjs` — a directory is a project if it _looks_ like one (`.git`, `docs/`,
+`package.json`, `plans/`), otherwise it is a container and gets descended into — and the same reasoning was
+applied inside `commons`: two container levels rather than one, and tail-matching for both the
+`--calibrate` fixtures and the divergence keys.
+**Why it matters more than the fix:** a tool that crashes gets fixed in a minute; a tool that returns a
+plausible smaller number gets _believed_. "No cross-project duplication found" was printed with total
+confidence while the scan was looking at four directories. Any tool that enumerates repos on this platform
+must be re-run after a layout change, and its output compared against a known count — for these two the
+known counts are 22 groups and 97 files.
+**Watch out:** `platform/`'s marker is `plans/` — it is not a git repo and has no `docs/`, so a marker set
+that omits it silently reclassifies it as a container and makes every platform plan invisible to
+`plan-checkin`.
+
 ## 2026-07-29 — the starter is real, and running it once found three shipping bugs
 
 **Context:** `starter-web-app` bundles the whole web-app spine (Dockerfile, compose, ghcr workflow, health
