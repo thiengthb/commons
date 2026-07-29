@@ -2,7 +2,7 @@
   "name": "@thiengthb/commons",
   "version": "0.1.0",
   "private": true,
-  "description": "The fleet's shared registry — installable UI, helpers, scripts and configs (copy-in, no runtime dependency).",
+  "description": "The fleet's shared registry \u2014 installable UI, helpers, scripts and configs (copy-in, no runtime dependency).",
   "type": "module",
   "scripts": {
     "registry:build": "shadcn build",
@@ -10,7 +10,8 @@
     "readme": "node scripts/gen-readme.mjs && prettier --write README.md --log-level warn",
     "readme:check": "node scripts/gen-readme.mjs --check",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "audit": "node scripts/audit-consumers.mjs"
   },
   "devDependencies": {
     "prettier": "^3.6.2",

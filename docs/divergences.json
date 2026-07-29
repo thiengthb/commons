@@ -1,0 +1,9 @@
+{
+  "_readme": "Deliberate divergences: a consumer file that intentionally differs from its registry item. `node scripts/audit-consumers.mjs` reports these as DELIBERATE instead of FORKED, so a real fork stays visible instead of being buried under known ones. A reason is required (>= 20 chars) — this is a decision record, not a mute switch. Key format: \"<repo>::<installed path>\".",
+  "divergences": {
+    "sakubun::lib/db.ts": "92 lines carrying the fail-closed multi-tenancy guard (sakubun invariant #5), not the 8-line singleton. The shared name is a coincidence; the file is a different thing and must never be overwritten by lib-db.",
+    "sakubun::scripts/rebuild-and-verify.sh": "The original this item was generalized FROM. It keeps app-specific MCP surface checks and a dynamic-route probe that do not belong in a shared script.",
+    "sakubun::lib/no-emoji.test.ts": "The richer original, with sakubun's own rationale in its docblock and a project-specific skip list. Fold the two only if sakubun's extras stop being sakubun-specific.",
+    "sakubun::components/ui/data-pagination.tsx": "Diverged while sakubun built viewport-fit pagination (use-fit-rows). Reconcile when fit-rows is extracted; until then the app is ahead of the registry, not behind it."
+  }
+}
