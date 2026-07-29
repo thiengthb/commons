@@ -15,6 +15,21 @@
           "target": "lib/db.ts"
         }
       ]
+    },
+    {
+      "name": "lib-env",
+      "type": "registry:lib",
+      "title": "Validated Environment",
+      "description": "Fail-fast environment validation with zod: import { env } from '@/lib/env' and a missing or malformed variable stops the process at startup listing every problem, instead of surfacing later as an undefined in a URL or a 500 on one route. Server/client separation is enforced (a server-only key read from client code throws), a forgotten NEXT_PUBLIC_ runtime entry is a COMPILE error, and SKIP_ENV_VALIDATION=1 keeps a docker build with no .env working. The t3-env pattern on plain zod — no new dependency.",
+      "categories": ["lib", "config"],
+      "dependencies": ["zod"],
+      "files": [
+        {
+          "path": "env.ts",
+          "type": "registry:lib",
+          "target": "lib/env.ts"
+        }
+      ]
     }
   ]
 }

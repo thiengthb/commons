@@ -15,6 +15,21 @@
           "target": "~/lib/no-emoji.test.ts"
         }
       ]
+    },
+    {
+      "name": "test-ci-hardening",
+      "type": "registry:item",
+      "title": "Gate: CI Hardening",
+      "description": "Four GitHub Actions hardening rules as a failing test that names every offending file:line — top-level permissions, third-party actions pinned to a full commit SHA (the tj-actions CVE-2025-30066 class), no pull_request_target, and no attacker-controlled context interpolated into a run: block. Trusted owners and strict mode live in docs/gates.json. Measured before it existed: 0 of 8 workflows on this platform declared top-level permissions and 0 pinned any action by SHA.",
+      "categories": ["test", "gate", "security"],
+      "devDependencies": ["vitest"],
+      "files": [
+        {
+          "path": "ci-hardening.test.ts",
+          "type": "registry:file",
+          "target": "~/lib/ci-hardening.test.ts"
+        }
+      ]
     }
   ]
 }

@@ -23,6 +23,26 @@
       "type": "registry:lib"
     },
     {
+      "name": "lib-env",
+      "title": "Validated Environment",
+      "description": "Fail-fast environment validation with zod: import { env } from '@/lib/env' and a missing or malformed variable stops the process at startup listing every problem, instead of surfacing later as an undefined in a URL or a 500 on one route. Server/client separation is enforced (a server-only key read from client code throws), a forgotten NEXT_PUBLIC_ runtime entry is a COMPILE error, and SKIP_ENV_VALIDATION=1 keeps a docker build with no .env working. The t3-env pattern on plain zod — no new dependency.",
+      "dependencies": [
+        "zod"
+      ],
+      "files": [
+        {
+          "path": "registry/lib/env.ts",
+          "type": "registry:lib",
+          "target": "lib/env.ts"
+        }
+      ],
+      "categories": [
+        "lib",
+        "config"
+      ],
+      "type": "registry:lib"
+    },
+    {
       "name": "script-rebuild-and-verify",
       "title": "Rebuild And Verify (local container)",
       "description": "Rebuilds a local containerized app and proves it serves: bounded health wait then a route sweep, so the exit code reflects the ROUTES rather than the build. Universal item — installs into any repo, framework-agnostic. Per-repo values live in scripts/verify.env, so the script itself stays identical everywhere.",
@@ -79,6 +99,22 @@
           "path": "registry/config/eslint.config.mjs",
           "type": "registry:file",
           "target": "~/eslint.config.mjs"
+        }
+      ],
+      "categories": [
+        "config"
+      ],
+      "type": "registry:item"
+    },
+    {
+      "name": "config-editorconfig",
+      "title": "EditorConfig",
+      "description": "The half of the formatting contract Prettier does not cover: what the editor does as you type, in every file type including the ones Prettier never sees (.env, Dockerfile, .sql, .conf). Values deliberately match config-prettier — Prettier READS this file for endOfLine/tabWidth/printWidth, so two configs that disagree make formatting flip depending on what touched the file last.",
+      "files": [
+        {
+          "path": "registry/config/editorconfig.txt",
+          "type": "registry:file",
+          "target": "~/.editorconfig"
         }
       ],
       "categories": [
@@ -172,6 +208,27 @@
       "type": "registry:item"
     },
     {
+      "name": "test-ci-hardening",
+      "title": "Gate: CI Hardening",
+      "description": "Four GitHub Actions hardening rules as a failing test that names every offending file:line — top-level permissions, third-party actions pinned to a full commit SHA (the tj-actions CVE-2025-30066 class), no pull_request_target, and no attacker-controlled context interpolated into a run: block. Trusted owners and strict mode live in docs/gates.json. Measured before it existed: 0 of 8 workflows on this platform declared top-level permissions and 0 pinned any action by SHA.",
+      "devDependencies": [
+        "vitest"
+      ],
+      "files": [
+        {
+          "path": "registry/test/ci-hardening.test.ts",
+          "type": "registry:file",
+          "target": "~/lib/ci-hardening.test.ts"
+        }
+      ],
+      "categories": [
+        "test",
+        "gate",
+        "security"
+      ],
+      "type": "registry:item"
+    },
+    {
       "name": "starter-web-app",
       "title": "Starter: Web App",
       "description": "The whole spine of a platform web-app in one command: a multi-stage Dockerfile with EXPOSE + HEALTHCHECK, a local docker-compose with a named volume, the ghcr build workflow gated on tests, an open /api/health, the standalone next.config, the verify script's config, and the doc set (00-map, decisions, gates). Pulls in the vitest/eslint/prettier configs, the rebuild-and-verify script and the no-emoji gate. Prisma is NOT assumed — the Dockerfile documents the three edits that add it.",
@@ -179,8 +236,10 @@
         "@thiengthb/config-vitest",
         "@thiengthb/config-eslint",
         "@thiengthb/config-prettier",
+        "@thiengthb/config-editorconfig",
         "@thiengthb/script-rebuild-and-verify",
-        "@thiengthb/test-no-emoji"
+        "@thiengthb/test-no-emoji",
+        "@thiengthb/test-ci-hardening"
       ],
       "files": [
         {

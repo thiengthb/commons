@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "config-editorconfig",
+  "title": "EditorConfig",
+  "description": "The half of the formatting contract Prettier does not cover: what the editor does as you type, in every file type including the ones Prettier never sees (.env, Dockerfile, .sql, .conf). Values deliberately match config-prettier — Prettier READS this file for endOfLine/tabWidth/printWidth, so two configs that disagree make formatting flip depending on what touched the file last.",
+  "files": [
+    {
+      "path": "registry/config/editorconfig.txt",
+      "content": "# EditorConfig — https://editorconfig.org — the half of the formatting contract Prettier does NOT cover:\n# what the EDITOR does while you type, in every file type, including the ones Prettier never sees\n# (.env, Dockerfile, .gitignore, .sql, .conf). Prettier fixes a file when it runs; this fixes it as it\n# is written, in any editor, on any machine.\n#\n# It MUST agree with .prettierrc, because Prettier reads this file: for endOfLine, tabWidth, useTabs and\n# printWidth, an option absent from .prettierrc is filled in from here, while an option present there\n# wins. Two configs that disagree therefore produce a file that flips formatting depending on whether\n# it was last touched by the editor or by `prettier --write`. The values below are the same contract:\n# LF, 2 spaces, width 100.\nroot = true\n\n[*]\ncharset = utf-8\nend_of_line = lf\nindent_style = space\nindent_size = 2\ninsert_final_newline = true\ntrim_trailing_whitespace = true\nmax_line_length = 100\n\n# Two trailing spaces are a hard line break in Markdown — trimming them silently rewrites the document.\n# Prose also wraps by meaning, not by a column, so no width is imposed.\n[*.md]\ntrim_trailing_whitespace = false\nmax_line_length = off\n\n# A tab is part of the syntax here, not a style choice: make/recipe lines and Go both require it.\n[{Makefile,makefile,*.mk,*.go}]\nindent_style = tab\n\n# Lockfiles and generated JSON are written by a tool; do not let an editor reformat them into a diff.\n[{package-lock.json,pnpm-lock.yaml,yarn.lock}]\nindent_size = unset\ninsert_final_newline = unset\n",
+      "type": "registry:file",
+      "target": "~/.editorconfig"
+    }
+  ],
+  "categories": [
+    "config"
+  ],
+  "type": "registry:item"
+}

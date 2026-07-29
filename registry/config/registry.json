@@ -37,6 +37,20 @@
       ]
     },
     {
+      "name": "config-editorconfig",
+      "type": "registry:item",
+      "title": "EditorConfig",
+      "description": "The half of the formatting contract Prettier does not cover: what the editor does as you type, in every file type including the ones Prettier never sees (.env, Dockerfile, .sql, .conf). Values deliberately match config-prettier — Prettier READS this file for endOfLine/tabWidth/printWidth, so two configs that disagree make formatting flip depending on what touched the file last.",
+      "categories": ["config"],
+      "files": [
+        {
+          "path": "editorconfig.txt",
+          "type": "registry:file",
+          "target": "~/.editorconfig"
+        }
+      ]
+    },
+    {
       "name": "config-prettier",
       "type": "registry:item",
       "title": "Prettier Config",

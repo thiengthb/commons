@@ -1,0 +1,35 @@
+# EditorConfig — https://editorconfig.org — the half of the formatting contract Prettier does NOT cover:
+# what the EDITOR does while you type, in every file type, including the ones Prettier never sees
+# (.env, Dockerfile, .gitignore, .sql, .conf). Prettier fixes a file when it runs; this fixes it as it
+# is written, in any editor, on any machine.
+#
+# It MUST agree with .prettierrc, because Prettier reads this file: for endOfLine, tabWidth, useTabs and
+# printWidth, an option absent from .prettierrc is filled in from here, while an option present there
+# wins. Two configs that disagree therefore produce a file that flips formatting depending on whether
+# it was last touched by the editor or by `prettier --write`. The values below are the same contract:
+# LF, 2 spaces, width 100.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+max_line_length = 100
+
+# Two trailing spaces are a hard line break in Markdown — trimming them silently rewrites the document.
+# Prose also wraps by meaning, not by a column, so no width is imposed.
+[*.md]
+trim_trailing_whitespace = false
+max_line_length = off
+
+# A tab is part of the syntax here, not a style choice: make/recipe lines and Go both require it.
+[{Makefile,makefile,*.mk,*.go}]
+indent_style = tab
+
+# Lockfiles and generated JSON are written by a tool; do not let an editor reformat them into a diff.
+[{package-lock.json,pnpm-lock.yaml,yarn.lock}]
+indent_size = unset
+insert_final_newline = unset
