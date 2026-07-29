@@ -1,0 +1,79 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "starter-web-app",
+  "title": "Starter: Web App",
+  "description": "The whole spine of a platform web-app in one command: a multi-stage Dockerfile with EXPOSE + HEALTHCHECK, a local docker-compose with a named volume, the ghcr build workflow gated on tests, an open /api/health, the standalone next.config, the verify script's config, and the doc set (00-map, decisions, gates). Pulls in the vitest/eslint/prettier configs, the rebuild-and-verify script and the no-emoji gate. Prisma is NOT assumed — the Dockerfile documents the three edits that add it.",
+  "registryDependencies": [
+    "@thiengthb/config-vitest",
+    "@thiengthb/config-eslint",
+    "@thiengthb/config-prettier",
+    "@thiengthb/script-rebuild-and-verify",
+    "@thiengthb/test-no-emoji"
+  ],
+  "files": [
+    {
+      "path": "registry/starter/Dockerfile",
+      "content": "# Standard image for a Next.js App Router app on this platform: multi-stage, standalone output, a\n# non-root user, an EXPOSEd port and a HEALTHCHECK the container runtime can actually read.\n#\n# Requires `output: 'standalone'` in next.config.ts (the starter ships that file too) — without it\n# .next/standalone does not exist and the runtime stage copies nothing.\n\n# ---------- deps ----------\nFROM node:24-alpine AS deps\nWORKDIR /app\nCOPY package*.json ./\nRUN npm ci\n\n# ---------- build ----------\nFROM node:24-alpine AS build\nWORKDIR /app\nCOPY --from=deps /app/node_modules ./node_modules\nCOPY . .\nENV NEXT_TELEMETRY_DISABLED=1\nRUN npm run build\n\n# ---------- runtime ----------\nFROM node:24-alpine\nWORKDIR /app\nENV NODE_ENV=production\nENV NEXT_TELEMETRY_DISABLED=1\n# tzdata so TZ actually applies — an app that computes \"today\" in local time needs it.\nRUN apk add --no-cache tzdata\n\nCOPY --from=build /app/.next/standalone ./\nCOPY --from=build /app/.next/static ./.next/static\nCOPY --from=build /app/public ./public\n\n# App data lives in a named VOLUME mounted here, never in the image and never a bind mount\n# (platform invariant: it must survive a rebuild and be movable between targets).\nRUN mkdir -p /data && chown node:node /data\nENV HOSTNAME=0.0.0.0\nENV PORT=3000\n\nUSER node\nEXPOSE 3000\n\nHEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \\\n  CMD wget -qO- http://127.0.0.1:3000/api/health || exit 1\n\nCMD [\"node\", \"server.js\"]\n\n# ---------- when you add Prisma ----------\n# This base is deliberately Prisma-free so a fresh app builds and runs before it has a schema. Once\n# `prisma/schema.prisma` exists, three edits make migrations apply on container start:\n#\n#   1. deps stage:     COPY prisma ./prisma      (before `npm ci`, so the postinstall sees it)\n#   2. build stage:    RUN npx prisma generate && npm run build\n#   3. a prisma-cli stage + a CMD that runs `prisma migrate deploy` before `exec node server.js`,\n#      and `RUN apk add --no-cache openssl` in the runtime stage (the engine needs it on alpine).\n#\n# The worked version is `todo/Dockerfile` — copy from there rather than re-deriving it.\n",
+      "type": "registry:file",
+      "target": "~/Dockerfile"
+    },
+    {
+      "path": "registry/starter/dockerignore.txt",
+      "content": "node_modules\n.next\n.git\n.env\n.env.*\n*.log\ncoverage\ntest-results\nplaywright-report\ndocs\nREADME.md\nDockerfile\n.dockerignore\ndocker-compose*.yml\n",
+      "type": "registry:file",
+      "target": "~/.dockerignore"
+    },
+    {
+      "path": "registry/starter/docker-compose.yml",
+      "content": "# Local run for `target: local` — the app is built here and published on a host port. No reverse proxy\n# and no identity provider in front of it; \"deploy\" means rebuild the container and verify it healthy.\n#\n# The compose PROJECT name comes from this directory, so the volume below really lands as\n# `<dirname>_app_data` — it already carries the app's name, and it is a named volume, never a bind mount.\nservices:\n  app:\n    build: .\n    image: ${APP_NAME:-app}:local\n    container_name: ${APP_NAME:-app}\n    restart: unless-stopped\n    ports:\n      # Pick a free port per app and pin it in .env — two local apps on 3000 is the usual collision.\n      - '${HOST_PORT:-3000}:3000'\n    environment:\n      TZ: ${TZ:-Asia/Ho_Chi_Minh}\n      # Secrets are read from .env (chmod 600, gitignored) — never written into this file.\n    volumes:\n      - app_data:/data\n\nvolumes:\n  app_data:\n",
+      "type": "registry:file",
+      "target": "~/docker-compose.yml"
+    },
+    {
+      "path": "registry/starter/next.config.ts",
+      "content": "import type { NextConfig } from 'next';\n\nconst nextConfig: NextConfig = {\n  // Required by the Dockerfile: the runtime stage copies .next/standalone, which only exists with this.\n  output: 'standalone',\n};\n\nexport default nextConfig;\n",
+      "type": "registry:file",
+      "target": "~/next.config.ts"
+    },
+    {
+      "path": "registry/starter/app-api-health/route.ts",
+      "content": "import { NextResponse } from 'next/server';\n\n/**\n * Liveness for the container HEALTHCHECK, CI and scripts/rebuild-and-verify.sh.\n *\n * Deliberately does NOT touch the database: this answers \"is the process serving?\", and a DB hiccup\n * must not make the orchestrator kill a healthy app. Add a separate /api/ready for deep readiness\n * (a `SELECT 1`) when something actually needs to distinguish the two.\n *\n * It stays OPEN — never put this endpoint behind auth, or nothing can check it.\n */\nexport function GET(): NextResponse {\n  return NextResponse.json({ ok: true });\n}\n",
+      "type": "registry:file",
+      "target": "~/app/api/health/route.ts"
+    },
+    {
+      "path": "registry/starter/github-workflows/deploy.yml",
+      "content": "# Build the image in GitHub Actions and push it to ghcr.io. Nothing here deploys: the target pulls.\n#\n# The image name derives from the repository, so this file needs no editing when you copy it into a new\n# repo. Tests gate the build — an image that fails its own suite never reaches the registry.\nname: build-and-push\n\non:\n  push:\n    branches: [main]\n    # Docs-only changes do not rebuild the image.\n    paths-ignore:\n      - '**.md'\n      - 'docs/**'\n  workflow_dispatch:\n\nenv:\n  REGISTRY: ghcr.io\n  IMAGE_NAME: ${{ github.repository }}\n\nconcurrency:\n  group: build-and-push\n  cancel-in-progress: false\n\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-node@v4\n        with:\n          node-version: 22\n          cache: npm\n      - run: npm ci\n      - run: npm run lint\n      # npx, not `npm test`: a registry item cannot merge a script into package.json, so the\n      # workflow must not assume one exists. Add \"test\": \"vitest run\" and use it if you prefer.\n      - run: npx vitest run\n\n  build:\n    needs: test\n    runs-on: ubuntu-latest\n    permissions:\n      contents: read\n      packages: write\n    steps:\n      - uses: actions/checkout@v4\n\n      - uses: docker/login-action@v3\n        with:\n          registry: ${{ env.REGISTRY }}\n          username: ${{ github.actor }}\n          password: ${{ secrets.GITHUB_TOKEN }}\n\n      - id: meta\n        uses: docker/metadata-action@v5\n        with:\n          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}\n          tags: |\n            type=raw,value=latest\n            type=sha\n\n      - uses: docker/setup-buildx-action@v3\n\n      - uses: docker/build-push-action@v6\n        with:\n          context: .\n          push: true\n          tags: ${{ steps.meta.outputs.tags }}\n          labels: ${{ steps.meta.outputs.labels }}\n          cache-from: type=gha\n          cache-to: type=gha,mode=max\n",
+      "type": "registry:file",
+      "target": "~/.github/workflows/deploy.yml"
+    },
+    {
+      "path": "registry/starter/scripts/verify.conf",
+      "content": "# Per-repo config for scripts/rebuild-and-verify.sh. Keeping the values here means the script itself\n# stays byte-identical to the registry copy, so a fix upstream is a re-add, not a merge.\nSERVICE=app\nBASE=http://localhost:3000\nHEALTH=/api/health\nEXPECT='\"ok\":true'\n# Every route a user can reach. Add each new page here — a green build says nothing about whether a\n# server component throws at render time.\nROUTES=\"/\"\n# Commands run by --gates. npx rather than npm scripts, so this works before package.json is edited.\nGATE_CMDS=\"npm run lint|npx vitest run|npx prettier --check .\"\n",
+      "type": "registry:file",
+      "target": "~/scripts/verify.conf"
+    },
+    {
+      "path": "registry/starter/docs/00-map.md",
+      "content": "# &lt;app&gt; — Map\n\n> Read this first. It is the cheap read that replaces opening the codebase, and it is the one doc that\n> must never go stale. Standard: `platform/standards/documentation.md`.\n>\n> **Scaffolded from `@thiengthb/starter-web-app`. Fill every &lt;placeholder&gt; before the first feature\n> lands** — a map that still says &lt;app&gt; is worse than no map, because it is read and believed.\n\n## 1. Essence\n\n&lt;One paragraph: what this app is for, who uses it, and the one thing it must get right.&gt;\n\n`kind`: `web-app` · `target`: &lt;nuc | local | cloud&gt; (the row in `platform/inventory.md §0` is the\nsource of truth — read it, do not assume).\n\n## 2. Stack\n\n| Layer    | Tech                                                       |\n| -------- | ---------------------------------------------------------- |\n| Frontend | Next.js App Router, React 19, Tailwind v4, shadcn/ui       |\n| Data     | &lt;Prisma + SQLite in the named volume at /data&gt;       |\n| Tests    | Vitest (`npm test`) — see `platform/standards/testing.md`  |\n| Deploy   | &lt;Dockerfile + docker-compose.yml; CI builds to ghcr&gt; |\n\n## 3. Module map / entry points\n\n```\napp/                 routes; app/api/health = liveness (open, never behind auth)\ncomponents/          UI; shared/product-agnostic pieces come from commons (`shadcn add @thiengthb/...`)\nlib/                 pure logic + the data layer\nscripts/             rebuild-and-verify.sh (+ verify.env, which holds this app's routes and port)\ndocs/                this map · decisions.md · gates.json · plans/\n```\n\n## 4. Main flows\n\n1. &lt;The one flow that matters most, end to end.&gt;\n\n## 5. Highlights\n\n- &lt;The non-obvious thing a newcomer would get wrong.&gt;\n\n## 6. Invariants\n\n- **App data lives in the named volume** (`/data`), never in the image, never a bind mount.\n- **Secrets only in `.env`** (chmod 600, gitignored) — never in compose, the Dockerfile or code.\n- **Never hand-roll auth** — an established library, or the target's identity provider.\n- **`/api/health` stays open**, or nothing can check whether the app is alive.\n- &lt;This app's own invariants.&gt;\n\n## 7. Secrets / env\n\n| Var         | What it is                       |\n| ----------- | -------------------------------- |\n| `HOST_PORT` | published port for the local run |\n| &lt;...&gt; | &lt;...&gt;                      |\n\n## 8. Working here\n\n```bash\nnpm run dev                          # localhost:3000\nnpx vitest run                       # tests (add \"test\": \"vitest run\" to package.json for `npm test`)\nnpx prettier --check .               # formatting (add \"format:check\" likewise)\nbash scripts/rebuild-and-verify.sh   # rebuild the container and prove it serves\n```\n\nThe two npm scripts above are the one thing `shadcn add` could not do for you: a registry item installs\nfiles, and `package.json` is a file it must not overwrite. Add them once and forget it.\n\n## 9. Further reading\n\n- The _why_ behind decisions: `docs/decisions.md` · active plans: `docs/plans/`\n- Platform rules: the repo-root `CLAUDE.md` and `platform/standards/`\n",
+      "type": "registry:file",
+      "target": "~/docs/00-map.md"
+    },
+    {
+      "path": "registry/starter/docs/decisions.md",
+      "content": "# Knowledge log — &lt;app&gt;\n\n> Architecture decisions and the _why_, recorded so the next session does not re-derive them.\n> Append-only, **newest on top**. Record only the non-obvious: a decision a reasonable person would\n> make differently, a trap that cost real time, a tradeoff that was actually weighed.\n>\n> Not a changelog. \"Added a settings page\" belongs in git; \"settings are a single row because a\n> per-key table made every read a join and nothing ever needed the flexibility\" belongs here.\n>\n> Standard: `platform/standards/documentation.md`. Written as you go, or by `/session-wrap` at the end\n> of a pass.\n\n---\n\n## &lt;YYYY-MM-DD&gt; — &lt;the decision, as a claim&gt;\n\n**Context:** &lt;what forced a choice&gt;\n**Decision:** &lt;what was chosen&gt;\n**Why:** &lt;the reasoning, including what was rejected and what it would have cost&gt;\n**Watch out:** &lt;the trap this creates for the next person&gt;\n\n---\n\n_(Add new decisions above this line, newest on top.)_\n",
+      "type": "registry:file",
+      "target": "~/docs/decisions.md"
+    },
+    {
+      "path": "registry/starter/docs/gates.json",
+      "content": "{\n  \"_readme\": \"Per-repo configuration for the shared gate tests installed from commons (@thiengthb/test-*). Keeping it here means the test files stay byte-identical to the registry copies — an exception is data, never an edit to the check. Prefer an inline `rulebook-allow: <rule-id> — <reason>` directive in the code itself; that one sentence satisfies both the generation-time hook and the test. The lists below are for a burn-down at install time, on an app that already has drift.\",\n  \"no-emoji\": {\n    \"roots\": [\"app\", \"components\", \"lib\"],\n    \"allow\": []\n  }\n}\n",
+      "type": "registry:file",
+      "target": "~/docs/gates.json"
+    }
+  ],
+  "categories": [
+    "starter"
+  ],
+  "type": "registry:item"
+}

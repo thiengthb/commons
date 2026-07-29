@@ -7,12 +7,7 @@
       "title": "Vitest Config",
       "description": "The platform's Vitest setup for a Next App Router + React 19 app: node environment by default (server actions and pure logic), jsdom opted into per file, the @/* alias resolved from tsconfig, and jest-dom matchers loaded. Universal item — lands vitest.config.ts + vitest.setup.ts at the repo root.",
       "categories": ["config", "testing"],
-      "devDependencies": [
-        "vitest",
-        "@vitejs/plugin-react",
-        "vite-tsconfig-paths",
-        "@testing-library/jest-dom"
-      ],
+      "devDependencies": ["vitest", "vite-tsconfig-paths", "@testing-library/jest-dom"],
       "files": [
         {
           "path": "vitest.config.ts",

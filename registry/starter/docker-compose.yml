@@ -1,0 +1,22 @@
+# Local run for `target: local` — the app is built here and published on a host port. No reverse proxy
+# and no identity provider in front of it; "deploy" means rebuild the container and verify it healthy.
+#
+# The compose PROJECT name comes from this directory, so the volume below really lands as
+# `<dirname>_app_data` — it already carries the app's name, and it is a named volume, never a bind mount.
+services:
+  app:
+    build: .
+    image: ${APP_NAME:-app}:local
+    container_name: ${APP_NAME:-app}
+    restart: unless-stopped
+    ports:
+      # Pick a free port per app and pin it in .env — two local apps on 3000 is the usual collision.
+      - '${HOST_PORT:-3000}:3000'
+    environment:
+      TZ: ${TZ:-Asia/Ho_Chi_Minh}
+      # Secrets are read from .env (chmod 600, gitignored) — never written into this file.
+    volumes:
+      - app_data:/data
+
+volumes:
+  app_data:

@@ -5,14 +5,13 @@
   "description": "The platform's Vitest setup for a Next App Router + React 19 app: node environment by default (server actions and pure logic), jsdom opted into per file, the @/* alias resolved from tsconfig, and jest-dom matchers loaded. Universal item — lands vitest.config.ts + vitest.setup.ts at the repo root.",
   "devDependencies": [
     "vitest",
-    "@vitejs/plugin-react",
     "vite-tsconfig-paths",
     "@testing-library/jest-dom"
   ],
   "files": [
     {
       "path": "registry/config/vitest.config.ts",
-      "content": "import { defineConfig } from 'vitest/config';\nimport react from '@vitejs/plugin-react';\nimport tsconfigPaths from 'vite-tsconfig-paths';\n\n// Shared Vitest config for a MiniServer web-app (Next.js App Router + React 19 + Prisma).\n// `tsconfigPaths()` makes the `@/*` alias (tsconfig \"paths\") resolve in tests.\n// Default environment is \"node\" (server actions + pure logic). Component test files\n// opt into jsdom with a top-of-file docblock:  // @vitest-environment jsdom\nexport default defineConfig({\n  plugins: [tsconfigPaths(), react()],\n  test: {\n    environment: 'node',\n    globals: true,\n    setupFiles: ['./vitest.setup.ts'],\n    include: ['**/*.test.{ts,tsx}'],\n    exclude: ['node_modules', '.next', 'dist'],\n  },\n});\n",
+      "content": "import { defineConfig } from 'vitest/config';\nimport tsconfigPaths from 'vite-tsconfig-paths';\n\n// Vitest for a Next.js App Router app on this platform.\n//\n// `tsconfigPaths()` makes the `@/*` alias (tsconfig \"paths\") resolve in tests. The default environment\n// is \"node\", which is what server actions and pure logic want; a component test opts into jsdom with a\n// top-of-file docblock:  // @vitest-environment jsdom\n//\n// Deliberately WITHOUT @vitejs/plugin-react: Vite transforms TSX through esbuild on its own, and the\n// plugin drags in a Babel tree that collides with the shadcn CLI's own Babel 7 pin — measured\n// 2026-07-29 on a fresh scaffold, where plugin-react 6.0.4 wants @babel/core 8 and npm refuses to\n// install at all. Add it, with jsdom and @testing-library/react, the day you write React component\n// tests; until then it is a dependency conflict bought for nothing.\nexport default defineConfig({\n  plugins: [tsconfigPaths()],\n  test: {\n    environment: 'node',\n    globals: true,\n    setupFiles: ['./vitest.setup.ts'],\n    include: ['**/*.test.{ts,tsx}'],\n    exclude: ['node_modules', '.next', 'dist'],\n  },\n});\n",
       "type": "registry:file",
       "target": "~/vitest.config.ts"
     },

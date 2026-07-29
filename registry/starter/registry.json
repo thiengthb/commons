@@ -1,0 +1,71 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "items": [
+    {
+      "name": "starter-web-app",
+      "type": "registry:item",
+      "title": "Starter: Web App",
+      "description": "The whole spine of a platform web-app in one command: a multi-stage Dockerfile with EXPOSE + HEALTHCHECK, a local docker-compose with a named volume, the ghcr build workflow gated on tests, an open /api/health, the standalone next.config, the verify script's config, and the doc set (00-map, decisions, gates). Pulls in the vitest/eslint/prettier configs, the rebuild-and-verify script and the no-emoji gate. Prisma is NOT assumed — the Dockerfile documents the three edits that add it.",
+      "categories": ["starter"],
+      "registryDependencies": [
+        "@thiengthb/config-vitest",
+        "@thiengthb/config-eslint",
+        "@thiengthb/config-prettier",
+        "@thiengthb/script-rebuild-and-verify",
+        "@thiengthb/test-no-emoji"
+      ],
+      "files": [
+        {
+          "path": "Dockerfile",
+          "type": "registry:file",
+          "target": "~/Dockerfile"
+        },
+        {
+          "path": "dockerignore.txt",
+          "type": "registry:file",
+          "target": "~/.dockerignore"
+        },
+        {
+          "path": "docker-compose.yml",
+          "type": "registry:file",
+          "target": "~/docker-compose.yml"
+        },
+        {
+          "path": "next.config.ts",
+          "type": "registry:file",
+          "target": "~/next.config.ts"
+        },
+        {
+          "path": "app-api-health/route.ts",
+          "type": "registry:file",
+          "target": "~/app/api/health/route.ts"
+        },
+        {
+          "path": "github-workflows/deploy.yml",
+          "type": "registry:file",
+          "target": "~/.github/workflows/deploy.yml"
+        },
+        {
+          "path": "scripts/verify.conf",
+          "type": "registry:file",
+          "target": "~/scripts/verify.conf"
+        },
+        {
+          "path": "docs/00-map.md",
+          "type": "registry:file",
+          "target": "~/docs/00-map.md"
+        },
+        {
+          "path": "docs/decisions.md",
+          "type": "registry:file",
+          "target": "~/docs/decisions.md"
+        },
+        {
+          "path": "docs/gates.json",
+          "type": "registry:file",
+          "target": "~/docs/gates.json"
+        }
+      ]
+    }
+  ]
+}

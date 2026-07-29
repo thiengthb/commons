@@ -7,7 +7,8 @@
     "registry/script/registry.json",
     "registry/config/registry.json",
     "registry/block/registry.json",
-    "registry/test/registry.json"
+    "registry/test/registry.json",
+    "registry/starter/registry.json"
   ],
   "items": [
     {

@@ -1,0 +1,7 @@
+{
+  "_readme": "Per-repo configuration for the shared gate tests installed from commons (@thiengthb/test-*). Keeping it here means the test files stay byte-identical to the registry copies — an exception is data, never an edit to the check. Prefer an inline `rulebook-allow: <rule-id> — <reason>` directive in the code itself; that one sentence satisfies both the generation-time hook and the test. The lists below are for a burn-down at install time, on an app that already has drift.",
+  "no-emoji": {
+    "roots": ["app", "components", "lib"],
+    "allow": []
+  }
+}
