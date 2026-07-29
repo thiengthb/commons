@@ -7,7 +7,7 @@
   "scripts": {
     "registry:build": "shadcn build",
     "validate": "shadcn registry validate",
-    "readme": "node scripts/gen-readme.mjs",
+    "readme": "node scripts/gen-readme.mjs && prettier --write README.md --log-level warn",
     "readme:check": "node scripts/gen-readme.mjs --check",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

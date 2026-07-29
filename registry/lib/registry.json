@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "items": [
+    {
+      "name": "lib-db",
+      "type": "registry:lib",
+      "title": "Prisma Client Singleton",
+      "description": "The global-cached PrismaClient every app needs — a fresh client per hot-reload exhausts connections in dev. Import { prisma } from '@/lib/db'.",
+      "categories": ["lib"],
+      "dependencies": ["@prisma/client"],
+      "files": [
+        {
+          "path": "db.ts",
+          "type": "registry:lib",
+          "target": "lib/db.ts"
+        }
+      ]
+    }
+  ]
+}

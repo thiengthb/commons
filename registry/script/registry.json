@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "items": [
+    {
+      "name": "script-rebuild-and-verify",
+      "type": "registry:item",
+      "title": "Rebuild And Verify (local container)",
+      "description": "Rebuilds a local containerized app and proves it serves: bounded health wait then a route sweep, so the exit code reflects the ROUTES rather than the build. Universal item — installs into any repo, framework-agnostic. Per-repo values live in scripts/verify.env, so the script itself stays identical everywhere.",
+      "categories": ["script", "ops"],
+      "files": [
+        {
+          "path": "rebuild-and-verify.sh",
+          "type": "registry:file",
+          "target": "~/scripts/rebuild-and-verify.sh"
+        }
+      ]
+    }
+  ]
+}

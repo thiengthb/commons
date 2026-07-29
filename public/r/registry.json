@@ -4,229 +4,343 @@
   "homepage": "https://github.com/thiengthb/commons",
   "items": [
     {
+      "name": "lib-db",
+      "title": "Prisma Client Singleton",
+      "description": "The global-cached PrismaClient every app needs — a fresh client per hot-reload exhausts connections in dev. Import { prisma } from '@/lib/db'.",
+      "dependencies": [
+        "@prisma/client"
+      ],
+      "files": [
+        {
+          "path": "registry/lib/db.ts",
+          "type": "registry:lib",
+          "target": "lib/db.ts"
+        }
+      ],
+      "categories": [
+        "lib"
+      ],
+      "type": "registry:lib"
+    },
+    {
+      "name": "script-rebuild-and-verify",
+      "title": "Rebuild And Verify (local container)",
+      "description": "Rebuilds a local containerized app and proves it serves: bounded health wait then a route sweep, so the exit code reflects the ROUTES rather than the build. Universal item — installs into any repo, framework-agnostic. Per-repo values live in scripts/verify.env, so the script itself stays identical everywhere.",
+      "files": [
+        {
+          "path": "registry/script/rebuild-and-verify.sh",
+          "type": "registry:file",
+          "target": "~/scripts/rebuild-and-verify.sh"
+        }
+      ],
+      "categories": [
+        "script",
+        "ops"
+      ],
+      "type": "registry:item"
+    },
+    {
       "name": "truncate",
-      "type": "registry:ui",
       "title": "Truncate",
       "description": "Smart single-line clamp — shows the tooltip only when the text actually overflows.",
-      "categories": ["ui"],
-      "registryDependencies": ["tooltip"],
+      "registryDependencies": [
+        "tooltip"
+      ],
       "files": [
         {
           "path": "registry/thiengthb/truncate.tsx",
           "type": "registry:ui",
           "target": "components/ui/truncate.tsx"
         }
-      ]
+      ],
+      "categories": [
+        "ui"
+      ],
+      "type": "registry:ui"
     },
     {
       "name": "empty-state",
-      "type": "registry:component",
       "title": "Empty State",
       "description": "The shared \"nothing here yet\" box: dashed border + icon + title + description + action, or free-form children when the copy is rich.",
-      "categories": ["ui"],
-      "dependencies": ["lucide-react"],
+      "dependencies": [
+        "lucide-react"
+      ],
       "files": [
         {
           "path": "registry/thiengthb/empty-state.tsx",
           "type": "registry:component",
           "target": "components/empty-state.tsx"
         }
-      ]
+      ],
+      "categories": [
+        "ui"
+      ],
+      "type": "registry:component"
     },
     {
       "name": "icon-tooltip",
-      "type": "registry:component",
       "title": "Icon Tooltip",
       "description": "Read-only tooltip for icon buttons — replaces every title= attribute. Short content on hover/focus.",
-      "categories": ["ui"],
-      "registryDependencies": ["tooltip"],
+      "registryDependencies": [
+        "tooltip"
+      ],
       "files": [
         {
           "path": "registry/thiengthb/icon-tooltip.tsx",
           "type": "registry:component",
           "target": "components/icon-tooltip.tsx"
         }
-      ]
+      ],
+      "categories": [
+        "ui"
+      ],
+      "type": "registry:component"
     },
     {
       "name": "info-hint",
-      "type": "registry:component",
       "title": "Info Hint",
       "description": "An info icon that opens a Popover on click/tap — replaces long inline descriptions, touch- and a11y-friendly.",
-      "categories": ["ui"],
-      "dependencies": ["lucide-react"],
-      "registryDependencies": ["popover"],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "popover"
+      ],
       "files": [
         {
           "path": "registry/thiengthb/info-hint.tsx",
           "type": "registry:component",
           "target": "components/info-hint.tsx"
         }
-      ]
+      ],
+      "categories": [
+        "ui"
+      ],
+      "type": "registry:component"
     },
     {
       "name": "info-tooltip",
-      "type": "registry:component",
       "title": "Info Tooltip",
       "description": "An info icon showing its description in a tooltip on hover/focus — the minimal sibling of info-hint; wraps and clamps. For titles and labels.",
-      "categories": ["ui"],
-      "dependencies": ["lucide-react"],
-      "registryDependencies": ["tooltip"],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "tooltip"
+      ],
       "files": [
         {
           "path": "registry/thiengthb/info-tooltip.tsx",
           "type": "registry:component",
           "target": "components/info-tooltip.tsx"
         }
-      ]
+      ],
+      "categories": [
+        "ui"
+      ],
+      "type": "registry:component"
     },
     {
       "name": "reveal",
-      "type": "registry:component",
       "title": "Reveal",
       "description": "Fade + slide-up on entering the viewport, pure CSS, respects reduced-motion.",
-      "categories": ["ui"],
       "files": [
         {
           "path": "registry/thiengthb/reveal.tsx",
           "type": "registry:component",
           "target": "components/reveal.tsx"
         }
-      ]
+      ],
+      "categories": [
+        "ui"
+      ],
+      "type": "registry:component"
     },
     {
       "name": "field",
-      "type": "registry:component",
       "title": "Field",
       "description": "Wraps label + control + hint/info for forms; cells fill a sm:grid-cols-2 grid.",
-      "categories": ["ui"],
-      "registryDependencies": ["@thiengthb/info-tooltip"],
+      "registryDependencies": [
+        "@thiengthb/info-tooltip"
+      ],
       "files": [
         {
           "path": "registry/thiengthb/field.tsx",
           "type": "registry:component",
           "target": "components/field.tsx"
         }
-      ]
+      ],
+      "categories": [
+        "ui"
+      ],
+      "type": "registry:component"
     },
     {
       "name": "date-picker",
-      "type": "registry:ui",
       "title": "Date Picker",
       "description": "Popover + Calendar, value is a local \"YYYY-MM-DD\" string. Date helpers inlined.",
-      "categories": ["ui"],
-      "dependencies": ["date-fns", "lucide-react"],
-      "registryDependencies": ["button", "calendar", "popover"],
+      "dependencies": [
+        "date-fns",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button",
+        "calendar",
+        "popover"
+      ],
       "files": [
         {
           "path": "registry/thiengthb/date-picker.tsx",
           "type": "registry:ui",
           "target": "components/ui/date-picker.tsx"
         }
-      ]
+      ],
+      "categories": [
+        "ui"
+      ],
+      "type": "registry:ui"
     },
     {
       "name": "time-picker",
-      "type": "registry:ui",
       "title": "Time Picker",
       "description": "Typed input + a Popover of time presets (15 min), value is a local \"HH:MM\" string. Time helpers inlined.",
-      "categories": ["ui"],
-      "dependencies": ["lucide-react"],
-      "registryDependencies": ["input", "popover", "scroll-area"],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "input",
+        "popover",
+        "scroll-area"
+      ],
       "files": [
         {
           "path": "registry/thiengthb/time-picker.tsx",
           "type": "registry:ui",
           "target": "components/ui/time-picker.tsx"
         }
-      ]
+      ],
+      "categories": [
+        "ui"
+      ],
+      "type": "registry:ui"
     },
     {
       "name": "skeletons",
-      "type": "registry:component",
       "title": "Skeletons",
       "description": "Skeleton set (PageHeader/Card/List/Grid) matching the standard card stock — for loading.tsx.",
-      "categories": ["ui"],
-      "registryDependencies": ["skeleton"],
+      "registryDependencies": [
+        "skeleton"
+      ],
       "files": [
         {
           "path": "registry/thiengthb/skeletons.tsx",
           "type": "registry:component",
           "target": "components/skeletons.tsx"
         }
-      ]
+      ],
+      "categories": [
+        "ui"
+      ],
+      "type": "registry:component"
     },
     {
       "name": "data-pagination",
-      "type": "registry:ui",
       "title": "Data Pagination",
       "description": "Controlled pagination (page/pageCount/onPageChange) + an ellipsis page window + an optional rows-per-page select; works for client- or server-side paging.",
-      "categories": ["ui"],
-      "dependencies": ["lucide-react"],
-      "registryDependencies": ["button", "select"],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button",
+        "select"
+      ],
       "files": [
         {
           "path": "registry/thiengthb/data-pagination.tsx",
           "type": "registry:ui",
           "target": "components/ui/data-pagination.tsx"
         }
-      ]
+      ],
+      "categories": [
+        "ui"
+      ],
+      "type": "registry:ui"
     },
     {
       "name": "page-header",
-      "type": "registry:component",
       "title": "Page Header",
       "description": "Consistent page header: eyebrow + h1 + description (as an info tooltip) + action + back-link. Next-only (next/link).",
-      "categories": ["ui"],
-      "dependencies": ["lucide-react"],
-      "registryDependencies": ["@thiengthb/info-tooltip"],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "@thiengthb/info-tooltip"
+      ],
       "files": [
         {
           "path": "registry/thiengthb/page-header.tsx",
           "type": "registry:component",
           "target": "components/page-header.tsx"
         }
-      ]
+      ],
+      "categories": [
+        "ui"
+      ],
+      "type": "registry:component"
     },
     {
       "name": "app-sidebar",
-      "type": "registry:component",
       "title": "App Sidebar",
       "description": "Config-driven navigation sidebar on the shadcn sidebar primitive: collapses to an icon rail (Cmd/Ctrl+B), switches to a Sheet on mobile, persists its state in a cookie, per-item tooltip when collapsed. Takes brand + groups (lucide icons) + footer. Next-only (next/link + navigation).",
-      "categories": ["ui", "block"],
-      "dependencies": ["lucide-react"],
-      "registryDependencies": ["sidebar"],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "sidebar"
+      ],
       "files": [
         {
           "path": "registry/thiengthb/app-sidebar.tsx",
           "type": "registry:component",
           "target": "components/app-sidebar.tsx"
         }
-      ]
+      ],
+      "categories": [
+        "ui",
+        "block"
+      ],
+      "type": "registry:component"
     },
     {
       "name": "breadcrumbs",
-      "type": "registry:component",
       "title": "Breadcrumbs",
       "description": "Parent-to-child navigation trail: each crumb carries an icon + a description tooltip; the last one marks the current page.",
-      "categories": ["ui"],
-      "dependencies": ["lucide-react"],
-      "registryDependencies": ["tooltip"],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "tooltip"
+      ],
       "files": [
         {
           "path": "registry/thiengthb/breadcrumbs.tsx",
           "type": "registry:component",
           "target": "components/breadcrumbs.tsx"
         }
-      ]
+      ],
+      "categories": [
+        "ui"
+      ],
+      "type": "registry:component"
     },
     {
       "name": "data-table",
-      "type": "registry:component",
       "title": "Data Table",
       "description": "Config-driven CRUD table on TanStack Table: multi-column sort (Shift-click), draggable column widths, show/hide columns, global search, a filter slot, a row-number column, multi-row selection + an app-supplied bulk action bar, and pagination — the whole view persisted to sessionStorage and mirrored to the URL. The app supplies columns (any cell renderer: edit/delete/badge) + the filters.",
-      "categories": ["ui", "block"],
-      "dependencies": ["@tanstack/react-table", "lucide-react"],
+      "dependencies": [
+        "@tanstack/react-table",
+        "lucide-react"
+      ],
       "registryDependencies": [
         "table",
         "button",
@@ -241,7 +355,12 @@
           "type": "registry:component",
           "target": "components/data-table.tsx"
         }
-      ]
+      ],
+      "categories": [
+        "ui",
+        "block"
+      ],
+      "type": "registry:component"
     }
   ]
 }
