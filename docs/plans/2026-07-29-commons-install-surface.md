@@ -17,6 +17,63 @@ related:
   ]
 ---
 
+## The ask, verbatim
+
+> _Added retroactively 2026-07-30 at `/session-wrap`. This plan predates the template section by one day
+> (`012ce6d`); the quotes below are lifted from the session transcript, not reconstructed from memory — which
+> is the only reason backfilling them is honest here._
+
+**2026-07-29, opening the work:**
+
+> "bạn hãy lên một plan tăng cường cho phần commons như mục tiêu tôi đã hướng tới, lưu các component ui sau
+> này có thể tái sử dụng lại, lưu những đoạn code, function, thủ tục sau này có thể tái sử dụng lại, hướng về
+> generic và reusable, lưu thêm các template, hoặc thành các framework để sau này phát triển một project được
+> đẩy nhanh hơn bằng cách copy code rồi sửa lại theo mục tiêu riêng của từng dự án, tìm các pattern tốt mà
+> trong tất cả dự án trong platform này có và cả trên mạng, tìm các rule tốt cho việc phát triển một dự án
+> phần mềm có đầy đủ rule của các quy trình, các test các script, ... . Bạn hãy suy nghĩ để tăng cường giúp tôi"
+
+**2026-07-30, adding the detection mechanism:**
+
+> "tôi cần một cơ chế tự nhận biết khi bạn đang làm một project nào đó, sẽ có một script hay một function quét
+> qua, giữa project hiện tại và project có sẵn trong fleet có điểm chung không, nếu điểm chung từ 2 hoặc 3 trở
+> lên phải làm thành reusable, và tôi cũng muống hướng đến việc code generic (nếu được để tối ưu code) nhưng
+> mà phải thuận tiện và tối ưu chứ khộng lại quá enginering"
+
+## Scope changes
+
+- **2026-07-29, agent → supervisor, accepted:** the plan was framed around the axis _installed vs read_ rather
+  than "put everything reusable in commons". Rule prose and standards therefore stay in `platform/` and were
+  never moved. Accepted at the gate as Option A.
+- **2026-07-29, supervisor:** Phase 5 (a Python starter) deferred behind a trigger rather than built.
+- **2026-07-30, supervisor:** the 16 FORKED rows the drift audit found were left uncleaned this pass
+  ("Chưa dọn, để danh sách đó"); only the in-app emoji group was cleaned.
+
+## Closing check — 2026-07-30: does what shipped satisfy what was actually asked?
+
+Measured against the verbatim quotes above plus the scope changes, not against this plan's own restatement.
+
+| What was asked                                                                                     | What shipped                                                                                                                                                                                                                                                                                                | Verdict                  |
+| -------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| reusable UI components                                                                             | 15 UI items + `page-shell` (the MANDATORY page frame) + `theme-toggle` (replacing 4 divergent copies)                                                                                                                                                                                                       | **met**                  |
+| reusable code / functions / procedures                                                             | `lib-db`, `script-rebuild-and-verify` (universal — installs into a repo with no `components.json`)                                                                                                                                                                                                          | **met**                  |
+| generic and reusable                                                                               | `page-shell` takes every app-specific piece as a slot and imports no `next/*`; the verify script keeps per-repo values in `scripts/verify.conf`                                                                                                                                                             | **met**                  |
+| templates / a framework so a new project starts by copying and editing                             | `starter-web-app`: empty dir → healthy container + HTTP 200 in **under 3 minutes**, measured                                                                                                                                                                                                                | **met**                  |
+| find the good patterns **across every project in this platform**                                   | `reuse-scan.mjs` — counts by distinct project, applies the rule of three; found 8 candidates and 3 duplications the catalog never had                                                                                                                                                                       | **met**                  |
+| a mechanism that notices while working on a project, and flags a shape at 2-3 occurrences          | `reuse-scan.mjs [project]` (the counter) + `reuse-guard.mjs` (the per-write gate, installed)                                                                                                                                                                                                                | **met**                  |
+| generic but convenient, **not over-engineered**                                                    | the scan classifies vendored/generated files as UPSTREAM and refuses to propose extracting `cn()`; two extraction candidates were deliberately declined with reasons                                                                                                                                        | **met**                  |
+| find good patterns **"và cả trên mạng"** (from the web too)                                        | External research went into the MECHANISM (shadcn universal items, winnowing k-grams, jscpd, Copier, AGENTS.md) — 6 sources, all cited. **No pattern was imported from the web INTO the registry**: every one of the 24 items came from this fleet's own code                                               | **MISS, named**          |
+| **"đầy đủ rule của các quy trình, các test các script"** (a full set of process/test/script rules) | 1 of 4 convention gates shipped (`test-no-emoji`) + the config set + one ops script. The other three (`layout-standard`, `type-scale`, `ui-pattern-lock`) were deliberately NOT extracted — they assume `PageShell` and a `ui-patterns.json` registry only `sakubun` has, so they would install un-passable | **PARTIAL, by decision** |
+
+**The two shortfalls are real and are not smoothed over.** The first is a genuine gap: "and from the web too"
+was read as "research the mechanism" when it can equally be read as "go find good components/patterns out
+there and stock the registry with them" — that second reading was never executed and never queued. The
+second is a decision with a written reason, but it is still less than "đầy đủ": three of four process gates
+remain single-repo, and `page-shell` shipping first is what unblocks them.
+
+**Next action for the gap:** ask the supervisor which reading of "và cả trên mạng" they meant before building
+anything — importing third-party patterns into `commons` would change what the registry is for, and that is
+their call, not a detail to infer.
+
 ## Goal
 
 One command puts a **proven artifact** of this platform into any repo — not only a React component, but a helper, a
