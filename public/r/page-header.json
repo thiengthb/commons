@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "page-header",
   "title": "Page Header",
-  "description": "Header trang đồng nhất: eyebrow + h1 + mô tả (tooltip ⓘ) + action + back-link. Next-only (next/link).",
+  "description": "Consistent page header: eyebrow + h1 + description (as an info tooltip) + action + back-link. Next-only (next/link).",
   "dependencies": [
     "lucide-react"
   ],
@@ -16,6 +16,9 @@
       "type": "registry:component",
       "target": "components/page-header.tsx"
     }
+  ],
+  "categories": [
+    "ui"
   ],
   "type": "registry:component"
 }

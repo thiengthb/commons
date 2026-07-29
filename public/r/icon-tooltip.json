@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "icon-tooltip",
   "title": "Icon Tooltip",
-  "description": "Tooltip read-only cho nút-icon — thay mọi title=. Nội dung ngắn khi hover/focus.",
+  "description": "Read-only tooltip for icon buttons — replaces every title= attribute. Short content on hover/focus.",
   "registryDependencies": [
     "tooltip"
   ],
@@ -13,6 +13,9 @@
       "type": "registry:component",
       "target": "components/icon-tooltip.tsx"
     }
+  ],
+  "categories": [
+    "ui"
   ],
   "type": "registry:component"
 }

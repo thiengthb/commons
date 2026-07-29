@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "info-hint",
   "title": "Info Hint",
-  "description": "Icon ⓘ mở Popover khi bấm/chạm — thay mô tả dài, hợp cảm ứng + a11y.",
+  "description": "An info icon that opens a Popover on click/tap — replaces long inline descriptions, touch- and a11y-friendly.",
   "dependencies": [
     "lucide-react"
   ],
@@ -16,6 +16,9 @@
       "type": "registry:component",
       "target": "components/info-hint.tsx"
     }
+  ],
+  "categories": [
+    "ui"
   ],
   "type": "registry:component"
 }

@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "data-table",
   "title": "Data Table",
-  "description": "Bảng CRUD config-driven trên nền TanStack Table: multi-sort (Shift-click), kéo giãn cột, ẩn/hiện cột, tìm kiếm toàn cục, slot bộ lọc, cột số thứ tự (STT), chọn nhiều dòng + thanh hành động hàng loạt (app cấp), phân trang — cả khung nhìn lưu vào sessionStorage + đồng bộ URL. App cấp columns (cell tuỳ ý: sửa/xóa/badge) + bộ lọc.",
+  "description": "Config-driven CRUD table on TanStack Table: multi-column sort (Shift-click), draggable column widths, show/hide columns, global search, a filter slot, a row-number column, multi-row selection + an app-supplied bulk action bar, and pagination — the whole view persisted to sessionStorage and mirrored to the URL. The app supplies columns (any cell renderer: edit/delete/badge) + the filters.",
   "dependencies": [
     "@tanstack/react-table",
     "lucide-react"
@@ -13,7 +13,7 @@
     "checkbox",
     "dropdown-menu",
     "input",
-    "data-pagination"
+    "@thiengthb/data-pagination"
   ],
   "files": [
     {
@@ -22,6 +22,10 @@
       "type": "registry:component",
       "target": "components/data-table.tsx"
     }
+  ],
+  "categories": [
+    "ui",
+    "block"
   ],
   "type": "registry:component"
 }

@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "info-tooltip",
   "title": "Info Tooltip",
-  "description": "Icon ⓘ hiện mô tả bằng tooltip khi hover/focus — bản minimal, tự wrap + clamp; dùng cho tiêu đề/nhãn.",
+  "description": "An info icon showing its description in a tooltip on hover/focus — the minimal sibling of info-hint; wraps and clamps. For titles and labels.",
   "dependencies": [
     "lucide-react"
   ],
@@ -16,6 +16,9 @@
       "type": "registry:component",
       "target": "components/info-tooltip.tsx"
     }
+  ],
+  "categories": [
+    "ui"
   ],
   "type": "registry:component"
 }

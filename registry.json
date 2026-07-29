@@ -1,16 +1,15 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
   "name": "thiengthb",
-  "homepage": "https://github.com/thiengthb/ui-kit",
+  "homepage": "https://github.com/thiengthb/commons",
   "items": [
     {
       "name": "truncate",
       "type": "registry:ui",
       "title": "Truncate",
-      "description": "Cắt 1 dòng thông minh — chỉ bật tooltip khi chữ thật sự tràn.",
-      "registryDependencies": [
-        "tooltip"
-      ],
+      "description": "Smart single-line clamp — shows the tooltip only when the text actually overflows.",
+      "categories": ["ui"],
+      "registryDependencies": ["tooltip"],
       "files": [
         {
           "path": "registry/thiengthb/truncate.tsx",
@@ -23,10 +22,9 @@
       "name": "empty-state",
       "type": "registry:component",
       "title": "Empty State",
-      "description": "Trạng thái rỗng dùng chung: viền nét đứt + icon + tiêu đề + mô tả + action, hoặc truyền children khi cần nội dung tự do.",
-      "dependencies": [
-        "lucide-react"
-      ],
+      "description": "The shared \"nothing here yet\" box: dashed border + icon + title + description + action, or free-form children when the copy is rich.",
+      "categories": ["ui"],
+      "dependencies": ["lucide-react"],
       "files": [
         {
           "path": "registry/thiengthb/empty-state.tsx",
@@ -39,10 +37,9 @@
       "name": "icon-tooltip",
       "type": "registry:component",
       "title": "Icon Tooltip",
-      "description": "Tooltip read-only cho nút-icon — thay mọi title=. Nội dung ngắn khi hover/focus.",
-      "registryDependencies": [
-        "tooltip"
-      ],
+      "description": "Read-only tooltip for icon buttons — replaces every title= attribute. Short content on hover/focus.",
+      "categories": ["ui"],
+      "registryDependencies": ["tooltip"],
       "files": [
         {
           "path": "registry/thiengthb/icon-tooltip.tsx",
@@ -55,13 +52,10 @@
       "name": "info-hint",
       "type": "registry:component",
       "title": "Info Hint",
-      "description": "Icon ⓘ mở Popover khi bấm/chạm — thay mô tả dài, hợp cảm ứng + a11y.",
-      "dependencies": [
-        "lucide-react"
-      ],
-      "registryDependencies": [
-        "popover"
-      ],
+      "description": "An info icon that opens a Popover on click/tap — replaces long inline descriptions, touch- and a11y-friendly.",
+      "categories": ["ui"],
+      "dependencies": ["lucide-react"],
+      "registryDependencies": ["popover"],
       "files": [
         {
           "path": "registry/thiengthb/info-hint.tsx",
@@ -74,13 +68,10 @@
       "name": "info-tooltip",
       "type": "registry:component",
       "title": "Info Tooltip",
-      "description": "Icon ⓘ hiện mô tả bằng tooltip khi hover/focus — bản minimal, tự wrap + clamp; dùng cho tiêu đề/nhãn.",
-      "dependencies": [
-        "lucide-react"
-      ],
-      "registryDependencies": [
-        "tooltip"
-      ],
+      "description": "An info icon showing its description in a tooltip on hover/focus — the minimal sibling of info-hint; wraps and clamps. For titles and labels.",
+      "categories": ["ui"],
+      "dependencies": ["lucide-react"],
+      "registryDependencies": ["tooltip"],
       "files": [
         {
           "path": "registry/thiengthb/info-tooltip.tsx",
@@ -93,7 +84,8 @@
       "name": "reveal",
       "type": "registry:component",
       "title": "Reveal",
-      "description": "Hiện dần (fade + trượt lên) khi vào viewport, CSS thuần, tôn trọng reduced-motion.",
+      "description": "Fade + slide-up on entering the viewport, pure CSS, respects reduced-motion.",
+      "categories": ["ui"],
       "files": [
         {
           "path": "registry/thiengthb/reveal.tsx",
@@ -106,10 +98,9 @@
       "name": "field",
       "type": "registry:component",
       "title": "Field",
-      "description": "Bọc nhãn + control + hint/info cho form; ô fill grid sm:grid-cols-2.",
-      "registryDependencies": [
-        "@thiengthb/info-tooltip"
-      ],
+      "description": "Wraps label + control + hint/info for forms; cells fill a sm:grid-cols-2 grid.",
+      "categories": ["ui"],
+      "registryDependencies": ["@thiengthb/info-tooltip"],
       "files": [
         {
           "path": "registry/thiengthb/field.tsx",
@@ -122,16 +113,10 @@
       "name": "date-picker",
       "type": "registry:ui",
       "title": "Date Picker",
-      "description": "Popover + Calendar, value chuỗi 'YYYY-MM-DD' địa phương. Helper ngày nội tuyến.",
-      "dependencies": [
-        "date-fns",
-        "lucide-react"
-      ],
-      "registryDependencies": [
-        "button",
-        "calendar",
-        "popover"
-      ],
+      "description": "Popover + Calendar, value is a local \"YYYY-MM-DD\" string. Date helpers inlined.",
+      "categories": ["ui"],
+      "dependencies": ["date-fns", "lucide-react"],
+      "registryDependencies": ["button", "calendar", "popover"],
       "files": [
         {
           "path": "registry/thiengthb/date-picker.tsx",
@@ -144,15 +129,10 @@
       "name": "time-picker",
       "type": "registry:ui",
       "title": "Time Picker",
-      "description": "Input gõ tay + Popover mốc giờ (15′), value 'HH:MM' địa phương. Helper giờ nội tuyến.",
-      "dependencies": [
-        "lucide-react"
-      ],
-      "registryDependencies": [
-        "input",
-        "popover",
-        "scroll-area"
-      ],
+      "description": "Typed input + a Popover of time presets (15 min), value is a local \"HH:MM\" string. Time helpers inlined.",
+      "categories": ["ui"],
+      "dependencies": ["lucide-react"],
+      "registryDependencies": ["input", "popover", "scroll-area"],
       "files": [
         {
           "path": "registry/thiengthb/time-picker.tsx",
@@ -165,10 +145,9 @@
       "name": "skeletons",
       "type": "registry:component",
       "title": "Skeletons",
-      "description": "Bộ skeleton (PageHeader/Card/List/Grid) khớp bộ card chuẩn — cho loading.tsx.",
-      "registryDependencies": [
-        "skeleton"
-      ],
+      "description": "Skeleton set (PageHeader/Card/List/Grid) matching the standard card stock — for loading.tsx.",
+      "categories": ["ui"],
+      "registryDependencies": ["skeleton"],
       "files": [
         {
           "path": "registry/thiengthb/skeletons.tsx",
@@ -181,14 +160,10 @@
       "name": "data-pagination",
       "type": "registry:ui",
       "title": "Data Pagination",
-      "description": "Điều khiển phân trang controlled (page/pageCount/onPageChange) + cửa sổ trang dấu … + bộ chọn số dòng/trang (tuỳ chọn); dùng cho phân trang client hoặc server.",
-      "dependencies": [
-        "lucide-react"
-      ],
-      "registryDependencies": [
-        "button",
-        "select"
-      ],
+      "description": "Controlled pagination (page/pageCount/onPageChange) + an ellipsis page window + an optional rows-per-page select; works for client- or server-side paging.",
+      "categories": ["ui"],
+      "dependencies": ["lucide-react"],
+      "registryDependencies": ["button", "select"],
       "files": [
         {
           "path": "registry/thiengthb/data-pagination.tsx",
@@ -201,13 +176,10 @@
       "name": "page-header",
       "type": "registry:component",
       "title": "Page Header",
-      "description": "Header trang đồng nhất: eyebrow + h1 + mô tả (tooltip ⓘ) + action + back-link. Next-only (next/link).",
-      "dependencies": [
-        "lucide-react"
-      ],
-      "registryDependencies": [
-        "@thiengthb/info-tooltip"
-      ],
+      "description": "Consistent page header: eyebrow + h1 + description (as an info tooltip) + action + back-link. Next-only (next/link).",
+      "categories": ["ui"],
+      "dependencies": ["lucide-react"],
+      "registryDependencies": ["@thiengthb/info-tooltip"],
       "files": [
         {
           "path": "registry/thiengthb/page-header.tsx",
@@ -220,13 +192,10 @@
       "name": "app-sidebar",
       "type": "registry:component",
       "title": "App Sidebar",
-      "description": "Sidebar điều hướng config-driven trên nền shadcn sidebar: thu gọn thành thanh icon (⌘/Ctrl+B), tự mở Sheet trên mobile, nhớ trạng thái qua cookie, tooltip khi thu gọn. Nhận brand + groups (icon lucide) + footer. Next-only (next/link + navigation).",
-      "dependencies": [
-        "lucide-react"
-      ],
-      "registryDependencies": [
-        "sidebar"
-      ],
+      "description": "Config-driven navigation sidebar on the shadcn sidebar primitive: collapses to an icon rail (Cmd/Ctrl+B), switches to a Sheet on mobile, persists its state in a cookie, per-item tooltip when collapsed. Takes brand + groups (lucide icons) + footer. Next-only (next/link + navigation).",
+      "categories": ["ui", "block"],
+      "dependencies": ["lucide-react"],
+      "registryDependencies": ["sidebar"],
       "files": [
         {
           "path": "registry/thiengthb/app-sidebar.tsx",
@@ -239,13 +208,10 @@
       "name": "breadcrumbs",
       "type": "registry:component",
       "title": "Breadcrumbs",
-      "description": "Breadcrumb điều hướng cha→con: mỗi mốc có icon + mô tả (tooltip); mốc cuối là trang hiện tại.",
-      "dependencies": [
-        "lucide-react"
-      ],
-      "registryDependencies": [
-        "tooltip"
-      ],
+      "description": "Parent-to-child navigation trail: each crumb carries an icon + a description tooltip; the last one marks the current page.",
+      "categories": ["ui"],
+      "dependencies": ["lucide-react"],
+      "registryDependencies": ["tooltip"],
       "files": [
         {
           "path": "registry/thiengthb/breadcrumbs.tsx",
@@ -258,18 +224,16 @@
       "name": "data-table",
       "type": "registry:component",
       "title": "Data Table",
-      "description": "Bảng CRUD config-driven trên nền TanStack Table: multi-sort (Shift-click), kéo giãn cột, ẩn/hiện cột, tìm kiếm toàn cục, slot bộ lọc, cột số thứ tự (STT), chọn nhiều dòng + thanh hành động hàng loạt (app cấp), phân trang — cả khung nhìn lưu vào sessionStorage + đồng bộ URL. App cấp columns (cell tuỳ ý: sửa/xóa/badge) + bộ lọc.",
-      "dependencies": [
-        "@tanstack/react-table",
-        "lucide-react"
-      ],
+      "description": "Config-driven CRUD table on TanStack Table: multi-column sort (Shift-click), draggable column widths, show/hide columns, global search, a filter slot, a row-number column, multi-row selection + an app-supplied bulk action bar, and pagination — the whole view persisted to sessionStorage and mirrored to the URL. The app supplies columns (any cell renderer: edit/delete/badge) + the filters.",
+      "categories": ["ui", "block"],
+      "dependencies": ["@tanstack/react-table", "lucide-react"],
       "registryDependencies": [
         "table",
         "button",
         "checkbox",
         "dropdown-menu",
         "input",
-        "data-pagination"
+        "@thiengthb/data-pagination"
       ],
       "files": [
         {

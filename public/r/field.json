@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "field",
   "title": "Field",
-  "description": "Bọc nhãn + control + hint/info cho form; ô fill grid sm:grid-cols-2.",
+  "description": "Wraps label + control + hint/info for forms; cells fill a sm:grid-cols-2 grid.",
   "registryDependencies": [
     "@thiengthb/info-tooltip"
   ],
@@ -13,6 +13,9 @@
       "type": "registry:component",
       "target": "components/field.tsx"
     }
+  ],
+  "categories": [
+    "ui"
   ],
   "type": "registry:component"
 }

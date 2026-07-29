@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "app-sidebar",
   "title": "App Sidebar",
-  "description": "Sidebar điều hướng config-driven trên nền shadcn sidebar: thu gọn thành thanh icon (⌘/Ctrl+B), tự mở Sheet trên mobile, nhớ trạng thái qua cookie, tooltip khi thu gọn. Nhận brand + groups (icon lucide) + footer. Next-only (next/link + navigation).",
+  "description": "Config-driven navigation sidebar on the shadcn sidebar primitive: collapses to an icon rail (Cmd/Ctrl+B), switches to a Sheet on mobile, persists its state in a cookie, per-item tooltip when collapsed. Takes brand + groups (lucide icons) + footer. Next-only (next/link + navigation).",
   "dependencies": [
     "lucide-react"
   ],
@@ -16,6 +16,10 @@
       "type": "registry:component",
       "target": "components/app-sidebar.tsx"
     }
+  ],
+  "categories": [
+    "ui",
+    "block"
   ],
   "type": "registry:component"
 }

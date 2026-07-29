@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "data-pagination",
   "title": "Data Pagination",
-  "description": "Điều khiển phân trang controlled (page/pageCount/onPageChange) + cửa sổ trang dấu … + bộ chọn số dòng/trang (tuỳ chọn); dùng cho phân trang client hoặc server.",
+  "description": "Controlled pagination (page/pageCount/onPageChange) + an ellipsis page window + an optional rows-per-page select; works for client- or server-side paging.",
   "dependencies": [
     "lucide-react"
   ],
@@ -17,6 +17,9 @@
       "type": "registry:ui",
       "target": "components/ui/data-pagination.tsx"
     }
+  ],
+  "categories": [
+    "ui"
   ],
   "type": "registry:ui"
 }
