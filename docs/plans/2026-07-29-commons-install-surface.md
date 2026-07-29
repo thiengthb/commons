@@ -3,7 +3,7 @@ title: commons — from a UI registry to the platform's INSTALL SURFACE (ui · l
 status: active # accepted 2026-07-29 by the supervisor — Option A, execute Phase 0+1 first then report before Phase 2
 kind: system-change
 created: 2026-07-29
-updated: 2026-07-29 # Phases 0, 1 and 2 done (2.4 deliberately NOT extracted, see the verdict table); next = Phase 3, the starter
+updated: 2026-07-29 # Phases 0-3 done and measured (empty dir to healthy container in under 3 min); next = Phase 4, discovery + fork detection
 checkin: 2026-08-26
 checkin_owner: supervisor
 related:
@@ -199,16 +199,16 @@ Verdicts fixed now so a later session executes instead of re-deciding:
 
 ### Phase 3 — the starter (the actual "start a project faster" deliverable)
 
-- [ ] 3.1 — `starter-web-app` (universal item, `registryDependencies` → the Phase-2 items) · Files: Create
+- [x] 3.1 — `starter-web-app` (universal item, `registryDependencies` → the Phase-2 items) · Files: Create
       `registry/starter/**` landing `tsconfig.json`, `eslint`/`prettier`/`vitest` configs, `.dockerignore`, `Dockerfile`
       (EXPOSE + HEALTHCHECK), `docker-compose.yml` (target `local`, **named volume**), `.github/workflows/deploy.yml`,
       `scripts/rebuild-and-verify.sh`, `lib/db.ts`, `lib/utils.ts`, `docs/00-map.md` + `docs/decisions.md` stubs,
       `app/guide/page.tsx` stub · Test: `AC-1` + `AC-10`
-- [ ] 3.2 — **Acceptance (run-it-and-see, this is the whole point):** in a scratch dir, `shadcn init --template next` +
+- [x] 3.2 — **Acceptance (run-it-and-see, this is the whole point):** in a scratch dir, `shadcn init --template next` +
       `shadcn add @thiengthb/starter-web-app` → `npm run build` + `npm test` + `docker compose up -d` ·
       Files: a scratch dir outside the repo, deleted after; `docs/decisions.md` (the wall-clock) ·
       Test: `AC-9` (healthy + HTTP 200, wall-clock recorded)
-- [ ] 3.3 — The starter must NOT write governance files. `CLAUDE.md`, `.claude/**` and `.env*` are gate-blocked for the
+- [x] 3.3 — The starter must NOT write governance files. `CLAUDE.md`, `.claude/**` and `.env*` are gate-blocked for the
       agent (autonomy contract) — the starter ships `docs/` stubs + a README pointer and leaves `CLAUDE.md` + secrets to
       `/app-onboard` + `/app-env` · Files: `registry/starter/registry.json` (the `files[].target` list) ·
       Test: `AC-10` (grep the targets for `CLAUDE.md|\.claude/|\.env` ⇒ 0)

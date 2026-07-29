@@ -5,6 +5,35 @@
 
 ---
 
+## 2026-07-29 — the starter is real, and running it once found three shipping bugs
+
+**Context:** `starter-web-app` bundles the whole web-app spine (Dockerfile, compose, ghcr workflow, health
+route, standalone next.config, verify config, doc set) and depends on the config/script/gate items.
+**Measured, end to end, on a throwaway app:** `shadcn init --template next --base radix --preset nova` 37s →
+`shadcn add @thiengthb/starter-web-app --yes --overwrite` lands **15 files** → `npm run build` 5s, vitest
+green, eslint clean → `bash scripts/rebuild-and-verify.sh` took it from no image to **healthy + HTTP 200 in
+44s**. Under three minutes total, two commands typed. The volume landed as `scratch-app_app_data` — the
+compose project name carries the app's name, so a single `app_data` key in the file is still per-app in reality.
+**Why the run mattered more than the artifact — three things it caught that review had not:**
+
+1. **`@vitejs/plugin-react` made the starter uninstallable.** Its 6.0.4 wants `@babel/core` 8 and collides
+   with the `shadcn` CLI's own Babel 7 pin; npm refused outright (`todo` is fine only because it has no
+   `shadcn` dependency). Dropped from `config-vitest` — Vite transforms TSX through esbuild anyway; add it the
+   day a repo writes React component tests.
+2. **A registry item cannot merge a script into `package.json`.** `npm test` simply does not exist in a fresh
+   scaffold, so the shipped workflow and gate commands call `npx vitest run` / `npx prettier --check .` and the
+   two convenience scripts are documented instead of assumed. This is the one thing the mechanism cannot do.
+3. **`verify.env` was renamed `verify.conf`.** It holds no secrets, but a name ending in `.env` reads as if it
+   does, and one `*.env` line in a `.gitignore` would have made the config silently uncommittable.
+
+**Also learned about the install path:** a **local JSON path cannot resolve `@thiengthb/*`
+registryDependencies** — the namespace has to be declared in the consumer's `components.json`, and the value
+must be a real HTTP URL (a bare filesystem path is resolved against `ui.shadcn.com`; `file://` returns "not
+implemented... yet"). So a multi-item bundle needs Approach B, and local iteration on it needs a throwaway
+static server over `public/r`. `--overwrite` is right on a fresh scaffold and **wrong on a living app** — it
+also refetches the shadcn primitives listed as registry deps, which on `todo` restyled `button.tsx` and
+`switch.tsx` and undid the repo's Prettier formatting.
+
 ## 2026-07-29 — the registry carries ANY file, so "installed vs read" is the scope line
 
 **Context:** `commons` held 15 UI components while everything else reusable on the platform was stranded in
