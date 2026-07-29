@@ -140,6 +140,23 @@ Recorded so these are not re-litigated:
   `process.env.X` read becomes `env.X`, and the app's Dockerfile needs the build-stage
   `SKIP_ENV_VALIDATION=1`. `todo` is the natural first, being the reference repo.
 
+## 6. Verdict log — append one row here, every time the outside was checked
+
+This is the running record that `/code-reuse` Step 1c writes to, and the reason the same question is never researched
+twice. **A refusal is a result** — most rows will be refusals, and they are the ones that save the most time later.
+
+Keep a row to one line. If the reasoning needs a paragraph, it is a `decisions.md` entry and this row links to it.
+
+| Date       | Looked for                                     | Where it was checked                                         | Verdict                                                                                                          |
+| ---------- | ---------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| 2026-07-30 | reusable UI components / patterns from the web | 8 shadcn community namespaces (`shadcn search`), zero-config | **§2 above** — 1 of 8 fits, per-item only; components referenced never vendored                                  |
+| 2026-07-30 | env validation                                 | `@t3-oss/env-nextjs`, `next-zodenv`, create-t3-app docs      | **ADOPTED as a pattern, refused as a dependency** → `lib-env` on plain zod                                       |
+| 2026-07-30 | CI/workflow hardening rules                    | GitHub changelog, StepSecurity, OWASP ASVS                   | **ADOPTED, subset** → `test-ci-hardening`; ASVS as a whole refused (needs per-app scoping)                       |
+| 2026-07-30 | container hardening                            | Docker hardening checklists ×2                               | **ADOPTED** → `cap_drop`/`no-new-privileges` active, `read_only` opt-in after measuring                          |
+| 2026-07-30 | editor/formatting config                       | EditorConfig spec + Prettier interaction                     | **ADOPTED** → `config-editorconfig`, values pinned to `config-prettier`                                          |
+| 2026-07-30 | typed server-action wrapper                    | `next-safe-action`, discriminated-union guides               | **REFUSED for now** — the contract is the 2026 norm but exists in 1 project; rule of three says wait for the 2nd |
+| 2026-07-30 | commit/lint tooling                            | `commitlint` + `husky` + `lint-staged`                       | **REFUSED** — the platform's own git hooks already enforce this; 3 deps to replace working enforcement           |
+
 ## Sources
 
 - [Pinning GitHub Actions for Enhanced Security](https://www.stepsecurity.io/blog/pinning-github-actions-for-enhanced-security-a-complete-guide) — StepSecurity; SHA pinning, and the `tj-actions/changed-files` tag-repointing compromise (CVE-2025-30066).
