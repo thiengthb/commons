@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "page-shell",
+  "title": "Page Shell",
+  "description": "The one page wrapper every route uses: vertical rhythm, the body-size baseline, a content width tier (full/wide/narrow/form) and a header row carrying the breadcrumb, tabs and page actions. Everything app-specific is a slot, so the file is identical in every repo. Implements platform/standards/ui-layout.md. No next/* import — works in any React app.",
+  "files": [
+    {
+      "path": "registry/block/page-shell.tsx",
+      "content": "import { type ReactNode } from 'react';\nimport { cn } from '@/lib/utils';\n\n/**\n * The one page wrapper every route uses — the single source of truth for page-level rhythm.\n *\n * The app shell owns horizontal width and side padding; this owns everything else. Before it existed,\n * every page hand-rolled its own `py-8 space-y-6` + max-width + breadcrumb and they drifted apart (some\n * pages shipped with no breadcrumb at all, max-widths ranged from max-w-2xl to max-w-5xl at random).\n *\n * Everything app-specific is a SLOT, so this file stays identical in every repo: the app supplies its own\n * breadcrumb node, its own header actions, its own mobile bar. No next/* import — it works in any React app.\n *\n * Platform standard: `platform/standards/ui-layout.md`.\n */\n\nexport type PageWidth = 'full' | 'wide' | 'narrow' | 'form';\n\n// `full` inherits the app shell's own max-width (data-dense pages: tables, grids, dashboards) and is the\n// default and the norm. The narrower tiers centre reading-width content (detail pages, forms, admin) and\n// are used sparingly — scattering per-page max-widths is the drift this component exists to stop.\nconst WIDTH: Record<PageWidth, string> = {\n  full: '',\n  wide: 'mx-auto max-w-5xl',\n  narrow: 'mx-auto max-w-3xl',\n  form: 'mx-auto max-w-2xl',\n};\n\ninterface PageShellProps {\n  children: ReactNode;\n  /** The breadcrumb trail. The app owns its own route-to-crumb map and passes the rendered node. */\n  breadcrumb?: ReactNode;\n  /** On the header row, beside the breadcrumb — a `<TabsList>` and/or a page action. */\n  headerAside?: ReactNode;\n  /** Pinned to the far right of the header row on every page — a notification bell, an avatar. */\n  actions?: ReactNode;\n  /** First on the header row — typically a mobile-only bar (app icon + sidebar opener). */\n  leading?: ReactNode;\n  /** Content max-width tier. Defaults to `full`. */\n  width?: PageWidth;\n  className?: string;\n}\n\nexport function PageShell({\n  children,\n  breadcrumb,\n  headerAside,\n  actions,\n  leading,\n  width = 'full',\n  className,\n}: PageShellProps) {\n  const hasHeader = Boolean(leading || breadcrumb || headerAside || actions);\n  return (\n    // `text-sm` is the body baseline: page content inherits 14px so a bare content block never renders\n    // larger than its own heading. Headings opt UP, meta opts DOWN to text-xs.\n    <div className={cn('space-y-4 py-6 text-sm', WIDTH[width], className)}>\n      {hasHeader && (\n        <div className=\"flex flex-wrap items-center gap-x-4 gap-y-2\">\n          {leading}\n          {breadcrumb}\n          {headerAside}\n          {/* `ml-auto` pins the actions right whatever else is on the row — including a page with\n              nothing else on it at all. */}\n          {actions && <div className=\"ml-auto shrink-0\">{actions}</div>}\n        </div>\n      )}\n      {children}\n    </div>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "components/page-shell.tsx"
+    }
+  ],
+  "categories": [
+    "block",
+    "layout"
+  ],
+  "type": "registry:component"
+}

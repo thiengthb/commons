@@ -40,6 +40,119 @@
       "type": "registry:item"
     },
     {
+      "name": "config-vitest",
+      "title": "Vitest Config",
+      "description": "The platform's Vitest setup for a Next App Router + React 19 app: node environment by default (server actions and pure logic), jsdom opted into per file, the @/* alias resolved from tsconfig, and jest-dom matchers loaded. Universal item — lands vitest.config.ts + vitest.setup.ts at the repo root.",
+      "devDependencies": [
+        "vitest",
+        "@vitejs/plugin-react",
+        "vite-tsconfig-paths",
+        "@testing-library/jest-dom"
+      ],
+      "files": [
+        {
+          "path": "registry/config/vitest.config.ts",
+          "type": "registry:file",
+          "target": "~/vitest.config.ts"
+        },
+        {
+          "path": "registry/config/vitest.setup.ts",
+          "type": "registry:file",
+          "target": "~/vitest.setup.ts"
+        }
+      ],
+      "categories": [
+        "config",
+        "testing"
+      ],
+      "type": "registry:item"
+    },
+    {
+      "name": "config-eslint",
+      "title": "ESLint Config",
+      "description": "Flat ESLint config for a Next.js app: core-web-vitals + typescript, with eslint-config-next's default ignores restated so they survive the override. Formatting stays with Prettier — ESLint carries logic rules only.",
+      "devDependencies": [
+        "eslint",
+        "eslint-config-next"
+      ],
+      "files": [
+        {
+          "path": "registry/config/eslint.config.mjs",
+          "type": "registry:file",
+          "target": "~/eslint.config.mjs"
+        }
+      ],
+      "categories": [
+        "config"
+      ],
+      "type": "registry:item"
+    },
+    {
+      "name": "config-prettier",
+      "title": "Prettier Config",
+      "description": "The platform formatting contract — single quotes, semicolons, print width 100, trailing commas, LF. Identical in every repo, so formatting never shows up as noise in a diff.",
+      "devDependencies": [
+        "prettier"
+      ],
+      "files": [
+        {
+          "path": "registry/config/prettierrc.json",
+          "type": "registry:file",
+          "target": "~/.prettierrc"
+        },
+        {
+          "path": "registry/config/prettierignore.txt",
+          "type": "registry:file",
+          "target": "~/.prettierignore"
+        }
+      ],
+      "categories": [
+        "config"
+      ],
+      "type": "registry:item"
+    },
+    {
+      "name": "page-shell",
+      "title": "Page Shell",
+      "description": "The one page wrapper every route uses: vertical rhythm, the body-size baseline, a content width tier (full/wide/narrow/form) and a header row carrying the breadcrumb, tabs and page actions. Everything app-specific is a slot, so the file is identical in every repo. Implements platform/standards/ui-layout.md. No next/* import — works in any React app.",
+      "files": [
+        {
+          "path": "registry/block/page-shell.tsx",
+          "type": "registry:component",
+          "target": "components/page-shell.tsx"
+        }
+      ],
+      "categories": [
+        "block",
+        "layout"
+      ],
+      "type": "registry:component"
+    },
+    {
+      "name": "theme-toggle",
+      "title": "Theme Toggle",
+      "description": "Light/dark control in the shapes the apps use — a ghost icon button, a labelled Switch row, or both (the shadcn sidebar's collapsed state picks). The icon shows the CURRENT theme and the aria-label names the ACTION; all copy is a prop, since user-facing text follows the product's language.",
+      "dependencies": [
+        "lucide-react",
+        "next-themes"
+      ],
+      "registryDependencies": [
+        "button",
+        "switch"
+      ],
+      "files": [
+        {
+          "path": "registry/block/theme-toggle.tsx",
+          "type": "registry:component",
+          "target": "components/theme-toggle.tsx"
+        }
+      ],
+      "categories": [
+        "block"
+      ],
+      "type": "registry:component"
+    },
+    {
       "name": "truncate",
       "title": "Truncate",
       "description": "Smart single-line clamp — shows the tooltip only when the text actually overflows.",

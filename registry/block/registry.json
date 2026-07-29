@@ -1,0 +1,35 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "items": [
+    {
+      "name": "page-shell",
+      "type": "registry:component",
+      "title": "Page Shell",
+      "description": "The one page wrapper every route uses: vertical rhythm, the body-size baseline, a content width tier (full/wide/narrow/form) and a header row carrying the breadcrumb, tabs and page actions. Everything app-specific is a slot, so the file is identical in every repo. Implements platform/standards/ui-layout.md. No next/* import — works in any React app.",
+      "categories": ["block", "layout"],
+      "files": [
+        {
+          "path": "page-shell.tsx",
+          "type": "registry:component",
+          "target": "components/page-shell.tsx"
+        }
+      ]
+    },
+    {
+      "name": "theme-toggle",
+      "type": "registry:component",
+      "title": "Theme Toggle",
+      "description": "Light/dark control in the shapes the apps use — a ghost icon button, a labelled Switch row, or both (the shadcn sidebar's collapsed state picks). The icon shows the CURRENT theme and the aria-label names the ACTION; all copy is a prop, since user-facing text follows the product's language.",
+      "categories": ["block"],
+      "dependencies": ["lucide-react", "next-themes"],
+      "registryDependencies": ["button", "switch"],
+      "files": [
+        {
+          "path": "theme-toggle.tsx",
+          "type": "registry:component",
+          "target": "components/theme-toggle.tsx"
+        }
+      ]
+    }
+  ]
+}

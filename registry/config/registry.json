@@ -1,0 +1,65 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "items": [
+    {
+      "name": "config-vitest",
+      "type": "registry:item",
+      "title": "Vitest Config",
+      "description": "The platform's Vitest setup for a Next App Router + React 19 app: node environment by default (server actions and pure logic), jsdom opted into per file, the @/* alias resolved from tsconfig, and jest-dom matchers loaded. Universal item — lands vitest.config.ts + vitest.setup.ts at the repo root.",
+      "categories": ["config", "testing"],
+      "devDependencies": [
+        "vitest",
+        "@vitejs/plugin-react",
+        "vite-tsconfig-paths",
+        "@testing-library/jest-dom"
+      ],
+      "files": [
+        {
+          "path": "vitest.config.ts",
+          "type": "registry:file",
+          "target": "~/vitest.config.ts"
+        },
+        {
+          "path": "vitest.setup.ts",
+          "type": "registry:file",
+          "target": "~/vitest.setup.ts"
+        }
+      ]
+    },
+    {
+      "name": "config-eslint",
+      "type": "registry:item",
+      "title": "ESLint Config",
+      "description": "Flat ESLint config for a Next.js app: core-web-vitals + typescript, with eslint-config-next's default ignores restated so they survive the override. Formatting stays with Prettier — ESLint carries logic rules only.",
+      "categories": ["config"],
+      "devDependencies": ["eslint", "eslint-config-next"],
+      "files": [
+        {
+          "path": "eslint.config.mjs",
+          "type": "registry:file",
+          "target": "~/eslint.config.mjs"
+        }
+      ]
+    },
+    {
+      "name": "config-prettier",
+      "type": "registry:item",
+      "title": "Prettier Config",
+      "description": "The platform formatting contract — single quotes, semicolons, print width 100, trailing commas, LF. Identical in every repo, so formatting never shows up as noise in a diff.",
+      "categories": ["config"],
+      "devDependencies": ["prettier"],
+      "files": [
+        {
+          "path": "prettierrc.json",
+          "type": "registry:file",
+          "target": "~/.prettierrc"
+        },
+        {
+          "path": "prettierignore.txt",
+          "type": "registry:file",
+          "target": "~/.prettierignore"
+        }
+      ]
+    }
+  ]
+}

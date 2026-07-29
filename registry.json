@@ -2,7 +2,12 @@
   "$schema": "https://ui.shadcn.com/schema/registry.json",
   "name": "thiengthb",
   "homepage": "https://github.com/thiengthb/commons",
-  "include": ["registry/lib/registry.json", "registry/script/registry.json"],
+  "include": [
+    "registry/lib/registry.json",
+    "registry/script/registry.json",
+    "registry/config/registry.json",
+    "registry/block/registry.json"
+  ],
   "items": [
     {
       "name": "truncate",

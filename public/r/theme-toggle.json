@@ -1,0 +1,26 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "theme-toggle",
+  "title": "Theme Toggle",
+  "description": "Light/dark control in the shapes the apps use — a ghost icon button, a labelled Switch row, or both (the shadcn sidebar's collapsed state picks). The icon shows the CURRENT theme and the aria-label names the ACTION; all copy is a prop, since user-facing text follows the product's language.",
+  "dependencies": [
+    "lucide-react",
+    "next-themes"
+  ],
+  "registryDependencies": [
+    "button",
+    "switch"
+  ],
+  "files": [
+    {
+      "path": "registry/block/theme-toggle.tsx",
+      "content": "'use client';\n\nimport { useSyncExternalStore } from 'react';\nimport { useTheme } from 'next-themes';\nimport { Moon, Sun } from 'lucide-react';\nimport { Button } from '@/components/ui/button';\nimport { Switch } from '@/components/ui/switch';\nimport { cn } from '@/lib/utils';\n\n/**\n * Light/dark control, in the two shapes the apps actually use:\n *\n *  - `icon`   — a ghost icon button (top bar, header actions). The default.\n *  - `switch` — a labelled row with a Switch (a settings list, an expanded sidebar).\n *  - `both`   — renders both and lets the sidebar's collapsed state pick, via\n *               `group-data-[collapsible=icon]` (the shadcn sidebar sets that attribute).\n *\n * Two things were inconsistent across the copies this replaces, so they are settled here:\n * the icon shows the CURRENT theme (Moon while dark), and the aria-label names the ACTION\n * (\"switch to light\"). One app had those two contradicting each other.\n *\n * All copy is a prop, because user-facing text follows the product's language, not this file's.\n */\n\n// `useSyncExternalStore` with a no-op subscribe is the smallest correct mounted-guard: the server\n// snapshot is always `false`, so the first client render matches the server and there is no hydration\n// mismatch — without the extra render an effect-based guard costs.\nconst emptySubscribe = () => () => {};\n\ninterface ThemeToggleProps {\n  shape?: 'icon' | 'switch' | 'both';\n  labels?: {\n    /** Row label in `switch`/`both` shape. */\n    row?: string;\n    /** aria-label while the dark theme is active (i.e. the action is \"go light\"). */\n    toLight?: string;\n    /** aria-label while the light theme is active. */\n    toDark?: string;\n  };\n  className?: string;\n}\n\nexport function ThemeToggle({ shape = 'icon', labels, className }: ThemeToggleProps) {\n  const { resolvedTheme, setTheme } = useTheme();\n  const mounted = useSyncExternalStore(\n    emptySubscribe,\n    () => true,\n    () => false,\n  );\n\n  const isDark = mounted && resolvedTheme === 'dark';\n  const toggle = () => setTheme(isDark ? 'light' : 'dark');\n  const ariaLabel = isDark\n    ? (labels?.toLight ?? 'Switch to the light theme')\n    : (labels?.toDark ?? 'Switch to the dark theme');\n  const Icon = isDark ? Moon : Sun;\n\n  const iconButton = (\n    <Button\n      type=\"button\"\n      variant=\"ghost\"\n      size=\"icon\"\n      onClick={toggle}\n      aria-label={ariaLabel}\n      className={cn(\n        shape === 'both' && 'hidden size-7 group-data-[collapsible=icon]:flex',\n        className,\n      )}\n    >\n      <Icon className=\"size-4\" aria-hidden />\n    </Button>\n  );\n\n  const switchRow = (\n    <div\n      className={cn(\n        'flex items-center justify-between gap-2 rounded-md px-2 py-1',\n        shape === 'both' && 'group-data-[collapsible=icon]:hidden',\n        shape === 'switch' && className,\n      )}\n    >\n      <span className=\"flex items-center gap-2 text-sm\">\n        <Icon className=\"size-4\" aria-hidden />\n        {labels?.row ?? 'Dark theme'}\n      </span>\n      <Switch checked={isDark} onCheckedChange={toggle} aria-label={ariaLabel} />\n    </div>\n  );\n\n  if (shape === 'icon') return iconButton;\n  if (shape === 'switch') return switchRow;\n  return (\n    <>\n      {switchRow}\n      {iconButton}\n    </>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "components/theme-toggle.tsx"
+    }
+  ],
+  "categories": [
+    "block"
+  ],
+  "type": "registry:component"
+}

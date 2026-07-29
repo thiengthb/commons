@@ -1,0 +1,27 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "config-prettier",
+  "title": "Prettier Config",
+  "description": "The platform formatting contract — single quotes, semicolons, print width 100, trailing commas, LF. Identical in every repo, so formatting never shows up as noise in a diff.",
+  "devDependencies": [
+    "prettier"
+  ],
+  "files": [
+    {
+      "path": "registry/config/prettierrc.json",
+      "content": "{\n  \"semi\": true,\n  \"singleQuote\": true,\n  \"printWidth\": 100,\n  \"tabWidth\": 2,\n  \"trailingComma\": \"all\",\n  \"arrowParens\": \"always\",\n  \"endOfLine\": \"lf\"\n}\n",
+      "type": "registry:file",
+      "target": "~/.prettierrc"
+    },
+    {
+      "path": "registry/config/prettierignore.txt",
+      "content": "node_modules\ndist\nbuild\ncoverage\n.next\n*.db\n*.db-shm\n*.db-wal\npackage-lock.json\npnpm-lock.yaml\n",
+      "type": "registry:file",
+      "target": "~/.prettierignore"
+    }
+  ],
+  "categories": [
+    "config"
+  ],
+  "type": "registry:item"
+}

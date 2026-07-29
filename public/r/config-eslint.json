@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "config-eslint",
+  "title": "ESLint Config",
+  "description": "Flat ESLint config for a Next.js app: core-web-vitals + typescript, with eslint-config-next's default ignores restated so they survive the override. Formatting stays with Prettier — ESLint carries logic rules only.",
+  "devDependencies": [
+    "eslint",
+    "eslint-config-next"
+  ],
+  "files": [
+    {
+      "path": "registry/config/eslint.config.mjs",
+      "content": "import { defineConfig, globalIgnores } from 'eslint/config';\nimport nextVitals from 'eslint-config-next/core-web-vitals';\nimport nextTs from 'eslint-config-next/typescript';\n\nconst eslintConfig = defineConfig([\n  ...nextVitals,\n  ...nextTs,\n  // Override default ignores of eslint-config-next.\n  globalIgnores([\n    // Default ignores of eslint-config-next:\n    '.next/**',\n    'out/**',\n    'build/**',\n    'next-env.d.ts',\n  ]),\n]);\n\nexport default eslintConfig;\n",
+      "type": "registry:file",
+      "target": "~/eslint.config.mjs"
+    }
+  ],
+  "categories": [
+    "config"
+  ],
+  "type": "registry:item"
+}

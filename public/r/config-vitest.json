@@ -1,0 +1,31 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "config-vitest",
+  "title": "Vitest Config",
+  "description": "The platform's Vitest setup for a Next App Router + React 19 app: node environment by default (server actions and pure logic), jsdom opted into per file, the @/* alias resolved from tsconfig, and jest-dom matchers loaded. Universal item — lands vitest.config.ts + vitest.setup.ts at the repo root.",
+  "devDependencies": [
+    "vitest",
+    "@vitejs/plugin-react",
+    "vite-tsconfig-paths",
+    "@testing-library/jest-dom"
+  ],
+  "files": [
+    {
+      "path": "registry/config/vitest.config.ts",
+      "content": "import { defineConfig } from 'vitest/config';\nimport react from '@vitejs/plugin-react';\nimport tsconfigPaths from 'vite-tsconfig-paths';\n\n// Shared Vitest config for a MiniServer web-app (Next.js App Router + React 19 + Prisma).\n// `tsconfigPaths()` makes the `@/*` alias (tsconfig \"paths\") resolve in tests.\n// Default environment is \"node\" (server actions + pure logic). Component test files\n// opt into jsdom with a top-of-file docblock:  // @vitest-environment jsdom\nexport default defineConfig({\n  plugins: [tsconfigPaths(), react()],\n  test: {\n    environment: 'node',\n    globals: true,\n    setupFiles: ['./vitest.setup.ts'],\n    include: ['**/*.test.{ts,tsx}'],\n    exclude: ['node_modules', '.next', 'dist'],\n  },\n});\n",
+      "type": "registry:file",
+      "target": "~/vitest.config.ts"
+    },
+    {
+      "path": "registry/config/vitest.setup.ts",
+      "content": "// Runs before every test file (see vitest.config.ts `setupFiles`).\n// jest-dom matchers (toBeInTheDocument, etc.) for component tests; harmless for node tests.\nimport '@testing-library/jest-dom/vitest';\n\n// React Testing Library auto-cleans the DOM between tests when `globals: true` is set\n// (afterEach is available globally), so no manual cleanup() is needed here.\n",
+      "type": "registry:file",
+      "target": "~/vitest.setup.ts"
+    }
+  ],
+  "categories": [
+    "config",
+    "testing"
+  ],
+  "type": "registry:item"
+}
