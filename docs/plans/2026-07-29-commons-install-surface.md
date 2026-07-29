@@ -234,6 +234,14 @@ Verdicts fixed now so a later session executes instead of re-deciding:
       initialize a non-JS repo, which is the one thing Option A genuinely can't do ·
       Files: undecided until the trigger fires · Test: the new repo reaches lint+test+container-healthy from the template alone
 
+      > **Re-examined 2026-07-29 with data, and it stays closed.** The count condition is already met —
+      > three repos hold Python (`nuc-monitor`, `nuc-ops-bot`, `yakudoku/core`). The **same-shape**
+      > condition is not: `reuse-scan` finds **zero** cross-project duplication among them above 0.72.
+      > The rule of three needs all three conditions (built 3x, same shape, stable), so a Python starter
+      > would be a template for a shape that does not exist yet. Re-run
+      > `node .claude/scripts/reuse-scan.mjs nuc-monitor --all` when a 4th Python repo appears; if it is
+      > still zero, the answer is that these workers are genuinely different programs, not three copies.
+
 ## Out of scope
 
 - **Rule prose does not move into `commons`** — standards/law stay in `platform/**`, generation-time rule delivery stays
