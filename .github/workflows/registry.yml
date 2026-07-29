@@ -10,6 +10,12 @@ on:
     branches: [main]
   pull_request:
 
+# Least privilege by DEFAULT: without this block every job inherits the repository default token
+# scope, which on an older repo is read/write. A job that runs `npm ci` executes arbitrary dependency
+# postinstall scripts and must not hold a token that can push. Jobs widen this individually.
+permissions:
+  contents: read
+
 jobs:
   verify:
     runs-on: ubuntu-latest
