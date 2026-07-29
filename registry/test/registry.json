@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "items": [
+    {
+      "name": "test-no-emoji",
+      "type": "registry:item",
+      "title": "Gate: No Emoji",
+      "description": "Turns the platform's no-emoji rule into a failing test that names every offending file:line. Roots and deliberate exceptions live in docs/gates.json, so the test file stays identical in every repo. Installing it into an existing app is a MIGRATION, not a copy — it lands red on whatever drift is already there.",
+      "categories": ["test", "gate"],
+      "devDependencies": ["vitest"],
+      "files": [
+        {
+          "path": "no-emoji.test.ts",
+          "type": "registry:file",
+          "target": "~/lib/no-emoji.test.ts"
+        }
+      ]
+    }
+  ]
+}

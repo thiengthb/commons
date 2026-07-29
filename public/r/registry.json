@@ -153,6 +153,26 @@
       "type": "registry:component"
     },
     {
+      "name": "test-no-emoji",
+      "title": "Gate: No Emoji",
+      "description": "Turns the platform's no-emoji rule into a failing test that names every offending file:line. Roots and deliberate exceptions live in docs/gates.json, so the test file stays identical in every repo. Installing it into an existing app is a MIGRATION, not a copy — it lands red on whatever drift is already there.",
+      "devDependencies": [
+        "vitest"
+      ],
+      "files": [
+        {
+          "path": "registry/test/no-emoji.test.ts",
+          "type": "registry:file",
+          "target": "~/lib/no-emoji.test.ts"
+        }
+      ],
+      "categories": [
+        "test",
+        "gate"
+      ],
+      "type": "registry:item"
+    },
+    {
       "name": "truncate",
       "title": "Truncate",
       "description": "Smart single-line clamp — shows the tooltip only when the text actually overflows.",
