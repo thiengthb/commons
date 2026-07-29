@@ -3,7 +3,7 @@ title: commons — from a UI registry to the platform's INSTALL SURFACE (ui · l
 status: active # accepted 2026-07-29 by the supervisor — Option A, execute Phase 0+1 first then report before Phase 2
 kind: system-change
 created: 2026-07-29
-updated: 2026-07-29 # Phases 0-3 done and measured (empty dir to healthy container in under 3 min); next = Phase 4, discovery + fork detection
+updated: 2026-07-29 # Phases 0-3 done + 4.1/4.3 done. OPEN: 4.2 (the gate half, needs a human to install a hook) and the push of commons to GitHub, without which the declared registry URL serves stale content
 checkin: 2026-08-26
 checkin_owner: supervisor
 related:
@@ -215,14 +215,14 @@ Verdicts fixed now so a later session executes instead of re-deciding:
 
 ### Phase 4 — make it get USED, and detect the forks (the copy-in tax)
 
-- [ ] 4.1 — Declare the `@thiengthb` registry in every consumer's `components.json` (`todo`, `journal`, `yakudoku/web`,
+- [x] 4.1 — Declare the `@thiengthb` registry in every consumer's `components.json` (`todo`, `journal`, `yakudoku/web`,
       `sakubun`) + document the shadcn MCP route · Files: `<app>/components.json`, `commons/README.md` ·
       Test: `npx shadcn view @thiengthb/page-header` resolves from each repo
 - [ ] 4.2 — The gate half (per constraint 1): extend the existing `/code-reuse` + `ui-pattern-lock` machinery so writing
       a file whose basename matches a registry item warns "commons ships this — `shadcn add` instead" · report-only first ·
       Files: `.claude/skills/code-reuse/**` (a human installs any hook — governance is gate-blocked for the agent) ·
       Test: `AC-11` (create `components/empty-state.tsx` in a scratch repo ⇒ warning fires)
-- [ ] 4.3 — Create `commons/scripts/audit-consumers.mjs`: for each consumer repo, compare the installed copy against the
+- [x] 4.3 — Create `commons/scripts/audit-consumers.mjs`: for each consumer repo, compare the installed copy against the
       registry source → `CLEAN | STALE | FORKED` + line delta. **Report-only** · Files: Create `scripts/audit-consumers.mjs` ·
       Test: `AC-12` (the 2026-07-19 `empty-state` fork is the known-positive fixture)
 
