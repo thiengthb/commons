@@ -1,0 +1,41 @@
+# Turns this repo's three "remember to do it" rules into gates.
+#
+# The one that matters most is the LAST step: `public/r/*.json` is what consumers actually fetch, so an
+# edit to `registry/**` that was never rebuilt ships nothing. That happened twice in a row (b06b815,
+# 171ae18 changed data-table and never rebuilt), which is why prose was replaced with this job.
+name: registry
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install
+        run: npm install --no-audit --no-fund
+
+      - name: Prettier
+        run: npm run format:check
+
+      - name: Validate the registry source
+        run: npm run validate
+
+      - name: README item table matches registry.json (and descriptions are English)
+        run: npm run readme:check
+
+      - name: Rebuild and fail if the committed artifacts are stale
+        run: |
+          npm run registry:build
+          if ! git diff --exit-code --stat public/r; then
+            echo "::error::public/r is stale — run 'npm run registry:build' and commit the result."
+            exit 1
+          fi
