@@ -113,6 +113,39 @@ function consumers() {
     : found;
 }
 
+/**
+ * Say out loud how many repos were searched, and cross-check it a second, independent way.
+ *
+ * This exists because of what happened on 2026-07-30: the repos moved under `projects/`, this script found
+ * 87 of 97 installed files instead of erroring, and the report read as authoritative. A tool that silently
+ * narrows its own input is the dangerous shape — so the input is now printed with every run, and compared
+ * against a plain `git ls-files`-independent count of `package.json` files. Deliberately NOT a stored
+ * baseline (which goes stale the day a project is added); two methods that must agree cannot both be
+ * quietly wrong.
+ */
+function selfCheck(seen) {
+  const direct = new Set();
+  const scan = (rel, depth) => {
+    const abs = join(FLEET, rel);
+    if (!existsSync(abs) || !statSync(abs).isDirectory()) return;
+    if (existsSync(join(abs, 'package.json'))) {
+      if (rel !== 'commons') direct.add(rel);
+      return;
+    }
+    if (depth === 0) return;
+    for (const entry of readdirSync(abs)) {
+      if (entry.startsWith('.') || entry === 'node_modules') continue;
+      scan(`${rel}/${entry}`, depth - 1);
+    }
+  };
+  for (const entry of readdirSync(FLEET)) {
+    if (entry.startsWith('.') || entry === 'node_modules') continue;
+    scan(entry, 2);
+  }
+  const missing = [...direct].filter((d) => !seen.includes(d));
+  return { direct: direct.size, missing };
+}
+
 /** Every historical version of a registry source file, newest first (excluding the current one). */
 function history(sourcePath) {
   try {
@@ -175,7 +208,8 @@ function lookupDivergence(repo, target) {
 }
 const historyCache = new Map();
 
-for (const repo of consumers()) {
+const searched = consumers();
+for (const repo of searched) {
   for (const file of files) {
     const abs = join(FLEET, repo, file.target);
     if (!existsSync(abs)) continue; // not installed here — nothing to say about it
@@ -228,6 +262,13 @@ const width = {
   target: Math.max(6, ...rows.map((r) => r.target.length)),
 };
 
+const check = selfCheck(searched);
+console.log(
+  `searched ${searched.length} repo(s) for ${files.length} registry file(s)` +
+    (check.missing.length
+      ? `  ** ${check.missing.length} repo(s) with a package.json were NOT searched: ${check.missing.join(', ')} **`
+      : ` (cross-checked: ${check.direct} repos hold a package.json)`),
+);
 console.log(
   `${pad('REPO', width.repo)}  ${pad('ITEM', width.item)}  ${pad('FILE', width.target)}  VERDICT`,
 );

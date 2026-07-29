@@ -1,6 +1,7 @@
 # commons — Map
 
-> One sentence: the fleet's shared **shadcn registry** — reusable building blocks distributed **copy-in**
+> One sentence: the fleet's shared **shadcn registry** — 24 installable artifacts (UI, helpers, configs, an ops
+> script, a rule-as-a-test, and a whole-app starter) distributed **copy-in**
 > (consumers run `shadcn add` and own the code). `kind`: `meta`, `target`: `none` — NOT deployed (no Docker, no
 > CI deploy, no Traefik). Path `<repo-root>/commons`, its own git repo `thiengthb/commons`.
 
@@ -11,10 +12,10 @@ frontend copies them in rather than re-deriving them (shadcn philosophy: compone
 dependency). No server, no image, no pipeline.
 
 Scope is defined by **mechanism, not content type**: what a consumer **installs** (a file lands in their repo)
-lives here; what a consumer **reads** to decide (law, standards, catalogs) stays in `platform/`. That is why 15
-UI components live here while the UI layout standard they implement does not. Widening this repo beyond UI —
-helpers, hooks, rule-enforcing tests, ops scripts, configs, a whole-app starter — is the active plan
-`docs/plans/2026-07-29-commons-install-surface.md`.
+lives here; what a consumer **reads** to decide (law, standards, catalogs) stays in `platform/`; what is enforced
+at generation time stays `rulebook`'s. So an executable rule ships as an item (`test-no-emoji`) while the prose it
+enforces does not move. The widening from 15 UI components to 24 artifacts across 7 layers was
+`docs/plans/2026-07-29-commons-install-surface.md` (phases 0-4 done 2026-07-30).
 
 Only stable, product-agnostic items belong here; per-app UI stays in its app.
 
@@ -30,18 +31,29 @@ Only stable, product-agnostic items belong here; per-app UI stays in its app.
 ## 3. Module map / entry points
 
 ```
-registry.json            authoritative manifest: 15 items (name/type/title/description/categories/deps/files[].target)
+registry.json            ROOT manifest: 15 UI items + `include` of the six layer manifests below (24 items total)
+registry/thiengthb/      the 15 UI item sources (kebab-case filenames, PascalCase exports)
+registry/lib/            lib-db — the Prisma singleton
+registry/script/         script-rebuild-and-verify — a UNIVERSAL item: installs into a repo with no components.json
+registry/config/         config-vitest · config-eslint · config-prettier
+registry/block/          page-shell (the MANDATORY page frame, all slots, no next/*) · theme-toggle
+registry/test/           test-no-emoji — a platform rule shipped as a failing test
+registry/starter/        starter-web-app — the whole web-app spine (Dockerfile, compose, CI, health, doc stubs)
 components.json          shadcn config for THIS repo (new-york, Tailwind neutral, @/ aliases)
-package.json             @thiengthb/commons, private:true — registry:build · validate · readme[:check] · format[:check]
+package.json             @thiengthb/commons, private:true — registry:build · validate · readme[:check] · audit · format[:check]
 .gitattributes           pins LF everywhere — load-bearing: the build embeds source AS A STRING (see §5)
 README.md                consumption guide (local path vs namespaced registry) + authoring guide + gotchas;
                          its item table is GENERATED — never hand-edit between the markers
 scripts/gen-readme.mjs   regenerates that table from registry.json + lints item metadata (--check for CI)
-registry/thiengthb/      the 15 item sources (kebab-case filenames, PascalCase exports)
+scripts/audit-consumers.mjs  where each consumer stands vs the registry: CLEAN/STALE/PROSE/FORKED/DELIBERATE/ADAPTED
 public/r/<name>.json     BUILT output (embedded source) — committed, this is what `shadcn add` fetches
 .github/workflows/       registry.yml (validate → readme:check → build → fail if public/r is dirty)
-docs/                    00-map.md · decisions.md · plans/
+docs/                    00-map.md · decisions.md · divergences.json (declared, reasoned forks) · plans/
 ```
+
+Two tools live OUTSIDE this repo because they reason across the whole fleet, not about one registry:
+`.claude/scripts/reuse-scan.mjs` (is a shape being built in 2-3 projects? applies the rule of three) and
+`.claude/hooks/reuse-guard.mjs` (a PreToolUse gate: writing a new file that an item already ships).
 
 ## 4. Main flows
 
