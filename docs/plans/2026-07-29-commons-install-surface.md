@@ -3,7 +3,7 @@ title: commons — from a UI registry to the platform's INSTALL SURFACE (ui · l
 status: active # accepted 2026-07-29 by the supervisor — Option A, execute Phase 0+1 first then report before Phase 2
 kind: system-change
 created: 2026-07-29
-updated: 2026-07-29 # Phases 0-3 done + 4.1/4.3 done. OPEN: 4.2 (the gate half, needs a human to install a hook) and the push of commons to GitHub, without which the declared registry URL serves stale content
+updated: 2026-07-29 # Phases 0-3 done, 4.1/4.3 done and PUBLISHED (all 5 repos pushed; 25 artifacts live, verified via the GitHub API). OPEN: only 4.2 (installs a hook = governance, a human owns it) and 5.1 (trigger has not fired)
 checkin: 2026-08-26
 checkin_owner: supervisor
 related:
