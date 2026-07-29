@@ -1,54 +1,88 @@
-# ui-kit — Map
+# commons — Map
 
-> One sentence: the platform's shared **shadcn registry** of reusable React/Next UI components, distributed **copy-in** (consumers run `npx shadcn add`, own the code). `kind`: `meta` (NOT deployed — no Docker/CI/Traefik). Dev path `MiniServer/ui-kit`.
+> One sentence: the fleet's shared **shadcn registry** — reusable building blocks distributed **copy-in**
+> (consumers run `shadcn add` and own the code). `kind`: `meta`, `target`: `none` — NOT deployed (no Docker, no
+> CI deploy, no Traefik). Path `<repo-root>/commons`, its own git repo `thiengthb/commons`.
 
 ## 1. Essence
 
-Build the reusable UI thing **once**. Components proven in `todo` are extracted here so other MiniServer frontends copy them in (shadcn philosophy: components are code you own, not an npm dependency). No server, no image, no pipeline. Only stable, product-agnostic components belong here — per-app UI stays in its app.
+Build the reusable thing **once**, then install it. Components proven in an app are extracted here so every other
+frontend copies them in rather than re-deriving them (shadcn philosophy: components are code you own, not an npm
+dependency). No server, no image, no pipeline.
+
+Scope is defined by **mechanism, not content type**: what a consumer **installs** (a file lands in their repo)
+lives here; what a consumer **reads** to decide (law, standards, catalogs) stays in `platform/`. That is why 15
+UI components live here while the UI layout standard they implement does not. Widening this repo beyond UI —
+helpers, hooks, rule-enforcing tests, ops scripts, configs, a whole-app starter — is the active plan
+`docs/plans/2026-07-29-commons-install-surface.md`.
+
+Only stable, product-agnostic items belong here; per-app UI stays in its app.
 
 ## 2. Stack
 
-| Layer | Tech |
-| --- | --- |
-| Tooling | `shadcn` CLI (`npx shadcn@latest build`) — devDependency only |
-| Format | TypeScript + TSX, shadcn `new-york` style, Tailwind CSS vars, `rsc:true` |
-| Build | `registry.json` (source of truth) → `shadcn build` → `public/r/<name>.json` (self-contained, what consumers fetch) |
-| Deploy | **none** — `private:true`, no Dockerfile, no `deploy.yml`, no `.env` |
+| Layer   | Tech                                                                                                               |
+| ------- | ------------------------------------------------------------------------------------------------------------------ |
+| Tooling | `shadcn` CLI (verified 4.16.0 on 2026-07-29) — devDependency only; `prettier`                                      |
+| Format  | TypeScript + TSX, shadcn `new-york` style, Tailwind CSS vars, `rsc: true`                                          |
+| Build   | `registry.json` (source of truth) → `shadcn build` → `public/r/<name>.json` (self-contained, what consumers fetch) |
+| Deploy  | **none** — `private: true`, no Dockerfile, no `deploy.yml`, no `.env`                                              |
 
 ## 3. Module map / entry points
 
 ```
-registry.json            authoritative manifest: 10 items (name/type/description/dependencies/registryDependencies/files[].target)
+registry.json            authoritative manifest: 15 items (name/type/title/description/categories/deps/files[].target)
 components.json          shadcn config for THIS repo (new-york, Tailwind neutral, @/ aliases)
-package.json             @thiengthb/ui-kit, private:true, script registry:build → shadcn build
-README.md                consumption guide (local path vs namespaced registry) + authoring guide + gotchas
-registry/thiengthb/
-  truncate · empty-state · icon-tooltip · info-hint · reveal · field* · date-picker · time-picker · skeletons · page-header**
-  (* field & page-header depend on @thiengthb/info-hint;  ** page-header is Next-only via next/link)
-public/r/<name>.json     BUILT output (embedded source) — committed, fetched by `shadcn add`
+package.json             @thiengthb/commons, private:true — registry:build · validate · readme[:check] · format[:check]
+.gitattributes           pins LF everywhere — load-bearing: the build embeds source AS A STRING (see §5)
+README.md                consumption guide (local path vs namespaced registry) + authoring guide + gotchas;
+                         its item table is GENERATED — never hand-edit between the markers
+scripts/gen-readme.mjs   regenerates that table from registry.json + lints item metadata (--check for CI)
+registry/thiengthb/      the 15 item sources (kebab-case filenames, PascalCase exports)
+public/r/<name>.json     BUILT output (embedded source) — committed, this is what `shadcn add` fetches
+.github/workflows/       registry.yml (validate → readme:check → build → fail if public/r is dirty)
+docs/                    00-map.md · decisions.md · plans/
 ```
 
 ## 4. Main flows
 
-1. **Author**: add `registry/thiengthb/<name>.tsx` → add an entry to `registry.json` (`dependencies` npm, `registryDependencies` shadcn/`@thiengthb/*`, `files[].target`) → `npx shadcn@latest build` → commit `public/r/`.
-2. **Consume — local path** (same machine): `npx shadcn@latest add ../ui-kit/public/r/truncate.json` (transitive registry deps added manually).
-3. **Consume — namespaced registry** (remote): add `"@thiengthb": "https://raw.githubusercontent.com/thiengthb/ui-kit/main/public/r/{name}.json"` to the consumer's `components.json`, then `npx shadcn@latest add @thiengthb/page-header` (transitive `@thiengthb/info-hint` resolved automatically).
+1. **Author**: add `registry/thiengthb/<name>.tsx` → add an entry to `registry.json` (`dependencies` npm,
+   `registryDependencies` shadcn primitives or **namespaced** `@thiengthb/*`, `files[].target`) →
+   `npm run registry:build` → `npm run readme` → commit `public/r/` **in the same commit**.
+2. **Consume — local path** (same machine): `npx shadcn add ../commons/public/r/truncate.json`. Transitive
+   `@thiengthb/*` deps are NOT resolved on this path — add them first.
+3. **Consume — namespaced registry** (any machine, and how an agent reaches it via the shadcn MCP server): declare
+   `"@thiengthb": "https://raw.githubusercontent.com/thiengthb/commons/main/public/r/{name}.json"` in the
+   consumer's `components.json`, then `npx shadcn add @thiengthb/data-table` (deps resolve automatically).
 
 ## 5. Highlights
 
-- **`todo` is the reference** — components were extracted from there, proven in production.
-- **`page-header` is Next-only** (`next/link`); don't use in non-Next projects unmodified.
-- **`date-picker` → shadcn `calendar` → `react-day-picker`**: the calendar template must match the installed `react-day-picker` major (v8 vs v9/v10 API differs — documented gotcha).
-- Copy-in means **bug fixes don't auto-propagate** — consumers re-run `shadcn add` for important patches.
+- **The build output is line-ending-sensitive.** `public/r/*.json` embeds each item's source as a JSON string, so
+  a build on Windows (where `core.autocrlf` checks LF blobs out as CRLF) bakes `\r\n` into the artifact and hands
+  consumers CRLF files. Measured 2026-07-29: 11 of 15 artifacts carried it. `.gitattributes` (`eol=lf`) is what
+  makes the build byte-identical across machines — and therefore gateable in CI.
+- **An un-rebuilt edit ships nothing.** `data-table` went two commits (`b06b815`, `171ae18`) with source changes
+  that never reached `public/r/data-table.json`, so `shadcn add data-table` kept delivering the old component.
+- **A bare `registryDependency` resolves against the DEFAULT shadcn registry** — `data-pagination` (ours) written
+  without the `@thiengthb/` namespace made a `data-table` install fail; `readme:check` now catches that class.
+- **Copy-in means fixes don't auto-propagate** — consumers re-run `shadcn add` for important patches. Detecting
+  the resulting forks is Phase 4 of the active plan (`scripts/audit-consumers.mjs`).
+- `page-header`, `app-sidebar`, `breadcrumbs` are **Next-only** (`next/link` / `next/navigation`).
+- **`date-picker` → shadcn `calendar` → `react-day-picker`**: the calendar template must match the installed
+  major (v8 vs v9/v10 API differ).
 
 ## 6. Invariants
 
-- **NOT deployed** — never add a Dockerfile, `deploy.yml`, Traefik label, or `.env`.
+- **NOT deployed** — never add a Dockerfile, `deploy.yml`, Traefik label, or `.env`. `private: true`, never published to npm.
+- **Every edit to `registry/**` or `registry.json` ⇒ `npm run registry:build` + commit `public/r/`** — enforced by
+  `.github/workflows/registry.yml`, not by memory.
+- **The README item table is generated** — edit `registry.json`, run `npm run readme`; never hand-edit inside the markers.
+- **Item `title` + `description` are required and written in ENGLISH** — they are what `shadcn view` and the shadcn
+  MCP server show an agent in another repo. Enforced by `readme:check`.
+- **A sibling item is referenced as `@thiengthb/<name>`**, never bare.
 - **Naming**: PascalCase React exports, **kebab-case filenames** (`date-picker.tsx`).
-- **Every edit to `registry/*.tsx` or `registry.json` ⇒ `npx shadcn build` + commit `public/r/`** (else consumers fetch stale output).
-- **Only product-agnostic, stable, reused-across-projects components** belong here (per-app UI stays in its app).
-- **Keep `registry.json` ↔ `nuc-platform/08-SHARED-ASSETS.md` in sync** when the component list changes.
-- `package.json` stays `private:true` — never published to npm.
+- **Only product-agnostic, stable items** — the `/code-reuse` rule of three, with one exemption: an artifact
+  implementing a **written platform standard** may be extracted at first use.
+- **Keep `platform/registries/shared-assets.md` in sync** in the same change when the item list changes.
 
 ## 7. Secrets / env
 
@@ -56,5 +90,7 @@ None — no runtime, no `.env`, no credentials.
 
 ## 8. Further reading
 
-- Consumption + authoring + gotchas: `README.md` · why copy-in/registry-first: `docs/decisions.md`
-- Shared-asset catalog: `nuc-platform/08-SHARED-ASSETS.md` · standard: `/react-ui-craft` ("build the reusable thing ONCE")
+- Consumption + authoring + gotchas: `README.md` · why copy-in / registry-first: `docs/decisions.md`
+- **Active plan**: `docs/plans/2026-07-29-commons-install-surface.md` (`status: active`, check-in 2026-08-26)
+- Shared-asset catalog: `platform/registries/shared-assets.md` (owned by `/code-reuse`) · UI law:
+  `platform/standards/ui-layout.md` + `/react-ui-craft`

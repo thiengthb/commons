@@ -1,7 +1,7 @@
-# Knowledge log — ui-kit
+# Knowledge log — commons
 
 > Architecture decisions + the _why_, recorded so the next session doesn't re-derive them. Append-only,
-> **newest on top**. Standard: `nuc-platform/05-documentation-standard.md §5`. Record only the non-obvious.
+> **newest on top**. Standard: `platform/standards/documentation.md §5`. Record only the non-obvious.
 
 ---
 
@@ -26,7 +26,7 @@ call sites relying on the old default need an explicit `p-8` or the box visibly 
 **Context:** several MiniServer frontends need the same components; how to share across independent repos?
 **Decision:** a shadcn **registry** distributed **copy-in** — `registry.json` → `shadcn build` → `public/r/*.json`; consumers `npx shadcn add` to copy the source into their repo (and own it). Registry-first (not raw file copy) so `registryDependencies` resolve transitively (e.g. `page-header` pulls `info-hint`) with the right npm deps + target path.
 **Why:** each project is an independent repo + image; a published package would need a private npm registry, a publish pipeline, and coordinated version bumps across all consumers. Copy-in decouples the registry from consumer release cycles and matches the shadcn philosophy (components are code you own). **Trade-off:** bug fixes don't auto-propagate — consumers re-run `shadcn add` for important patches.
-**Related:** `registry.json`, `README.md`, `nuc-platform/08-SHARED-ASSETS.md`, [[link-manager-golden-ref-dangling]].
+**Related:** `registry.json`, `README.md`, `platform/registries/shared-assets.md`, [[link-manager-golden-ref-dangling]].
 
 ## 2026-06 — Only product-agnostic, stable, ≥3×-reused components belong here
 

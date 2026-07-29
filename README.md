@@ -1,72 +1,78 @@
-# @thiengthb/ui-kit — shared shadcn registry
+# @thiengthb/commons — the platform's shared registry
 
-A **shared** frontend component set for every React/Next project in `D:\Projects\MiniServer\`,
-distributed as a **shadcn custom registry** — i.e. **copy-in, NOT a runtime dependency**.
+A **shared, installable** set of building blocks for every project in the fleet, distributed as a **shadcn
+custom registry** — i.e. **copy-in, NOT a runtime dependency**. Today that is 15 React/Next UI components;
+the registry is being widened to also carry helpers, hooks, rule-enforcing tests, ops scripts, configs and a
+whole-app starter (roadmap: `docs/plans/2026-07-29-commons-install-surface.md`).
 
-> **Why copy-in rather than an npm package?** MiniServer architecture: each project = an independent
-> repo + Docker image, the NUC only pulls. A runtime dep (`@thiengthb/ui`) would force maintaining a
-> private registry + publish pipeline + bumping versions across many repos at once, and goes against
-> the shadcn philosophy ("a component is code you own, not a dep"). Copy-in: each project pulls the
-> source down, **owns and can edit it**, with no runtime coupling. The trade-off: a fix in one place
-> does NOT propagate automatically — when there's an important patch, `shadcn add` it again.
+> **Why copy-in rather than an npm package?** Each project here is an independent repo + Docker image. A
+> runtime dep (`@thiengthb/ui`) would force a private npm registry + a publish pipeline + coordinated version
+> bumps across many repos at once, and goes against the shadcn philosophy ("a component is code you own, not a
+> dep"). Copy-in: each project pulls the source down, **owns and can edit it**, with no runtime coupling. The
+> trade-off is real — a fix here does **not** propagate automatically; on an important patch, `shadcn add` it
+> again. Full reasoning: `docs/decisions.md`.
 
 ## What's in the registry
 
-| Item | Description | shadcn deps to add | Notes |
-| --- | --- | --- | --- |
-| `truncate` | Smart single-line clamp, only shows the tooltip on overflow | `tooltip` | |
-| `empty-state` | Shared empty state | – | |
-| `icon-tooltip` | Read-only tooltip for icon buttons (replaces `title=`) | `tooltip` | |
-| `info-hint` | ⓘ icon opening an explanation Popover (touch + a11y friendly) | `popover` | |
-| `reveal` | Reveal gradually on entering the viewport, pure CSS | – | |
-| `field` | Wraps label + control + hint/info for forms | (pulls in `info-hint`) | |
-| `date-picker` | Popover + Calendar, value `YYYY-MM-DD` local | `button` `calendar` `popover` | npm `date-fns`; inline helpers |
-| `time-picker` | Input + Popover time presets, value `HH:MM` | `input` `popover` `scroll-area` | inline helpers |
-| `skeletons` | Skeleton set matching the standard card for `loading.tsx` | `skeleton` | |
-| `page-header` | Consistent page header (eyebrow + h1 + action + back) | (pulls in `info-hint`) | ⚠️ **Next-only** (`next/link`) |
+The table below is **generated from `registry.json`** — do not hand-edit it. Run `npm run readme` after adding
+or changing an item (CI runs `npm run readme:check` and fails on a stale table).
 
-The item sources live in `registry/thiengthb/*.tsx`. Every item assumes the consuming project already
-has shadcn (`@/lib/utils` exposes `cn`, the `@/` alias) — just like every MiniServer frontend.
+<!-- BEGIN GENERATED: items (node scripts/gen-readme.mjs) -->
 
-## 1) Build the registry (in this folder)
+<!-- 15 items -->
 
-`shadcn build` reads `registry.json` → generates JSON embedding the source into `public/r/<name>.json`
-(this is what other projects fetch).
+| Item              | What it is                                                                                                                                                                                                                                                                                                                                                                                             | Installs to                         | Also pulls in                                                                                                                          |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `truncate`        | Smart single-line clamp — shows the tooltip only when the text actually overflows.                                                                                                                                                                                                                                                                                                                     | `components/ui/truncate.tsx`        | `tooltip`                                                                                                                              |
+| `empty-state`     | The shared "nothing here yet" box: dashed border + icon + title + description + action, or free-form children when the copy is rich.                                                                                                                                                                                                                                                                   | `components/empty-state.tsx`        | npm `lucide-react`                                                                                                                     |
+| `icon-tooltip`    | Read-only tooltip for icon buttons — replaces every title= attribute. Short content on hover/focus.                                                                                                                                                                                                                                                                                                    | `components/icon-tooltip.tsx`       | `tooltip`                                                                                                                              |
+| `info-hint`       | An info icon that opens a Popover on click/tap — replaces long inline descriptions, touch- and a11y-friendly.                                                                                                                                                                                                                                                                                          | `components/info-hint.tsx`          | `popover`, npm `lucide-react`                                                                                                          |
+| `info-tooltip`    | An info icon showing its description in a tooltip on hover/focus — the minimal sibling of info-hint; wraps and clamps. For titles and labels.                                                                                                                                                                                                                                                          | `components/info-tooltip.tsx`       | `tooltip`, npm `lucide-react`                                                                                                          |
+| `reveal`          | Fade + slide-up on entering the viewport, pure CSS, respects reduced-motion.                                                                                                                                                                                                                                                                                                                           | `components/reveal.tsx`             | –                                                                                                                                      |
+| `field`           | Wraps label + control + hint/info for forms; cells fill a sm:grid-cols-2 grid.                                                                                                                                                                                                                                                                                                                         | `components/field.tsx`              | `@thiengthb/info-tooltip`                                                                                                              |
+| `date-picker`     | Popover + Calendar, value is a local "YYYY-MM-DD" string. Date helpers inlined.                                                                                                                                                                                                                                                                                                                        | `components/ui/date-picker.tsx`     | `button`, `calendar`, `popover`, npm `date-fns`, npm `lucide-react`                                                                    |
+| `time-picker`     | Typed input + a Popover of time presets (15 min), value is a local "HH:MM" string. Time helpers inlined.                                                                                                                                                                                                                                                                                               | `components/ui/time-picker.tsx`     | `input`, `popover`, `scroll-area`, npm `lucide-react`                                                                                  |
+| `skeletons`       | Skeleton set (PageHeader/Card/List/Grid) matching the standard card stock — for loading.tsx.                                                                                                                                                                                                                                                                                                           | `components/skeletons.tsx`          | `skeleton`                                                                                                                             |
+| `data-pagination` | Controlled pagination (page/pageCount/onPageChange) + an ellipsis page window + an optional rows-per-page select; works for client- or server-side paging.                                                                                                                                                                                                                                             | `components/ui/data-pagination.tsx` | `button`, `select`, npm `lucide-react`                                                                                                 |
+| `page-header`     | Consistent page header: eyebrow + h1 + description (as an info tooltip) + action + back-link. Next-only (next/link).                                                                                                                                                                                                                                                                                   | `components/page-header.tsx`        | `@thiengthb/info-tooltip`, npm `lucide-react`                                                                                          |
+| `app-sidebar`     | Config-driven navigation sidebar on the shadcn sidebar primitive: collapses to an icon rail (Cmd/Ctrl+B), switches to a Sheet on mobile, persists its state in a cookie, per-item tooltip when collapsed. Takes brand + groups (lucide icons) + footer. Next-only (next/link + navigation).                                                                                                            | `components/app-sidebar.tsx`        | `sidebar`, npm `lucide-react`                                                                                                          |
+| `breadcrumbs`     | Parent-to-child navigation trail: each crumb carries an icon + a description tooltip; the last one marks the current page.                                                                                                                                                                                                                                                                             | `components/breadcrumbs.tsx`        | `tooltip`, npm `lucide-react`                                                                                                          |
+| `data-table`      | Config-driven CRUD table on TanStack Table: multi-column sort (Shift-click), draggable column widths, show/hide columns, global search, a filter slot, a row-number column, multi-row selection + an app-supplied bulk action bar, and pagination — the whole view persisted to sessionStorage and mirrored to the URL. The app supplies columns (any cell renderer: edit/delete/badge) + the filters. | `components/data-table.tsx`         | `table`, `button`, `checkbox`, `dropdown-menu`, `input`, `@thiengthb/data-pagination`, npm `@tanstack/react-table`, npm `lucide-react` |
+
+<!-- END GENERATED: items -->
+
+Sources live in `registry/thiengthb/*.tsx`. Every item assumes the consuming project already has shadcn
+(`@/lib/utils` exports `cn`, the `@/` alias resolves) — as every frontend in this fleet does.
+
+**Next-only items** (they import `next/link` / `next/navigation`): `page-header`, `app-sidebar`, `breadcrumbs`.
+
+## 1) Consuming from another project
+
+### Approach A — LOCAL path (zero-infra, works right now)
+
+Every project sits beside this one on the same machine, so point straight at the built JSON:
 
 ```bash
-cd D:\Projects\MiniServer\ui-kit
-npx shadcn@latest build      # outputs public/r/*.json
+cd ../journal
+npx shadcn@latest add ../commons/public/r/truncate.json
+npx shadcn@latest add ../commons/public/r/empty-state.json
 ```
 
-Re-run this command whenever you edit/add a component, then commit `public/r/`.
+shadcn copies the component to the item's `target`, installs its npm deps and pulls any missing shadcn
+primitives (`tooltip`, `popover`, …).
 
-## 2) Consuming from another project
+> With Approach A, a `@thiengthb/*` **registry dependency is not resolved** — add it yourself first
+> (e.g. `info-tooltip.json` before `page-header.json`, `data-pagination.json` before `data-table.json`).
 
-There are 2 approaches, pick per your needs:
+### Approach B — namespaced registry (from any machine, and what agents use)
 
-### Approach A — LOCAL path (zero-infra, usable right away)
-
-Since every project is on the same machine, point straight at the built JSON file:
-
-```bash
-cd D:\Projects\MiniServer\journal
-npx shadcn@latest add ../ui-kit/public/r/truncate.json
-npx shadcn@latest add ../ui-kit/public/r/empty-state.json
-```
-
-shadcn copies the component to the right `target`, installs the npm dep (e.g. `lucide-react`) and pulls
-the shadcn deps (`tooltip`, `popover`) if missing.
-
-### Approach B — namespaced registry (when you want to use it from another machine / more concise)
-
-Push `ui-kit` to GitHub **public** (`thiengthb/ui-kit` — it's only UI source, no secret), then declare
-the registry in the consuming project's `components.json`:
+Declare the registry once in the consuming project's `components.json`:
 
 ```jsonc
 {
   "registries": {
-    "@thiengthb": "https://raw.githubusercontent.com/thiengthb/ui-kit/main/public/r/{name}.json"
-  }
+    "@thiengthb": "https://raw.githubusercontent.com/thiengthb/commons/main/public/r/{name}.json",
+  },
 }
 ```
 
@@ -74,33 +80,53 @@ Then:
 
 ```bash
 npx shadcn@latest add @thiengthb/truncate
-npx shadcn@latest add @thiengthb/page-header   # automatically pulls in @thiengthb/info-hint
+npx shadcn@latest add @thiengthb/page-header    # pulls in @thiengthb/info-tooltip automatically
+npx shadcn@latest add @thiengthb/data-table     # pulls in @thiengthb/data-pagination automatically
 ```
 
-> `page-header` declares `registryDependencies: ["@thiengthb/info-hint"]`, so APPROACH B pulls in
-> `info-hint` automatically. With APPROACH A, `add` `info-hint.json` before page-header.
+Transitive `@thiengthb/*` deps resolve on this path, which is why it is the preferred one. It also makes the
+registry reachable by the **shadcn MCP server**, so an agent working in another repo can search and install
+items by name instead of re-writing them.
 
-## 3) Adding a new component to the registry
+## 2) Adding an item
 
-1. Create `registry/thiengthb/<name>.tsx` (keep the `@/lib/utils`, `@/components/ui/*` imports as in the app).
-2. Add an entry to `items[]` in `registry.json`: declare `dependencies` (npm) + `registryDependencies`
-   (shadcn primitives or other `@thiengthb/<item>`) + `files[].target`.
-3. `npx shadcn@latest build` → commit.
+1. Create `registry/thiengthb/<name>.tsx` (keep the `@/lib/utils` + `@/components/ui/*` imports as in an app).
+2. Add an entry to `items[]` in `registry.json`: `dependencies` (npm) + `registryDependencies` (shadcn
+   primitives, or a **namespaced** `@thiengthb/<item>`) + `files[].target`.
+3. `npm run registry:build` → commit `public/r/`. `npm run readme` to refresh the table above.
 
-**Only put STABLE things here that are NOT tied to a specific product.** Do NOT add `app-shell`, `streak-chip`,
-`day-nav`, `mood-picker`… (those are per-app UI).
+**Only STABLE, product-agnostic things belong here.** Per-app UI (`streak-chip`, `mood-picker`, `day-nav`)
+stays in its app. The gate is `/code-reuse`'s rule of three, with one exemption: an artifact that implements a
+**written platform standard** may be extracted at first use.
 
-## Known gotcha
+## 3) Local checks (what CI runs)
 
-- **`date-picker` pulls shadcn `calendar`** → `calendar` in turn depends on **`react-day-picker`**. The
-  shadcn `calendar` template must MATCH the major version of the installed `react-day-picker` (v8 uses
-  `classNames.table`, v9/v10 changed the API → a mismatch errors with `'table' does not exist in type
-  Partial<ClassNames>`). If you hit it: reinstall `calendar` at the right version (`npx shadcn add calendar`)
-  to match the project's `react-day-picker`, or drop `date-picker` if unused. (This is a shadcn↔react-day-picker
-  issue, not one of this registry.)
+```bash
+npm run validate       # shadcn registry validate — schema, duplicate names, local file paths
+npm run readme:check   # the table above matches registry.json; descriptions are English
+npm run registry:build # rebuild public/r — CI fails if this dirties the tree
+npm run format:check   # prettier
+```
+
+## Known gotchas
+
+- **The build embeds source as a string, so line endings are part of the output.** `.gitattributes` pins LF
+  everywhere; without it a build on Windows bakes CRLF into `public/r/*.json` and hands consumers CRLF files
+  (this happened to 11 of 15 items before 2026-07-29).
+- **Editing `registry/**` without rebuilding ships nothing.** `public/r/*.json` is what consumers fetch, so an
+  un-rebuilt fix is invisible to them — `data-table` shipped for two commits without its own bug fix. CI now
+  gates this; run `npm run registry:build` before committing.
+- **A bare `registryDependency` resolves against the DEFAULT shadcn registry.** Referencing a sibling item as
+  `data-pagination` instead of `@thiengthb/data-pagination` makes the install fail with "item not found".
+  `readme:check` now catches this.
+- **`date-picker` pulls the shadcn `calendar`**, which depends on **`react-day-picker`**. The `calendar`
+  template must match the installed major (v8 uses `classNames.table`; v9/v10 changed the API → the mismatch
+  errors with `'table' does not exist in type Partial<ClassNames>`). Fix: re-add `calendar` at the version
+  matching the project's `react-day-picker`, or skip `date-picker` if unused.
 
 ## Relation to the shared rules
 
-This realizes the **"Frontend — shared engineering standard"** section in `MiniServer/CLAUDE.md`
-(skill `/react-ui-craft`): "build the reusable thing ONCE". The components here are extracted from the
-`todo` app (actually running per §12) — `todo` is the reference implementation.
+This is the **install** half of the platform's reuse model: artifacts that land _in_ a repo live here; the
+_law_ they follow (`platform/standards/ui-layout.md`, `/react-ui-craft`, `/coding-convention`) is read from
+`platform/`, not installed. The catalog of what exists and where is
+`platform/registries/shared-assets.md`, owned by `/code-reuse`.
