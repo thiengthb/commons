@@ -99,10 +99,36 @@ items by name instead of re-writing them.
 
 ## 2) Adding an item
 
-1. Create `registry/thiengthb/<name>.tsx` (keep the `@/lib/utils` + `@/components/ui/*` imports as in an app).
-2. Add an entry to `items[]` in `registry.json`: `dependencies` (npm) + `registryDependencies` (shadcn
-   primitives, or a **namespaced** `@thiengthb/<item>`) + `files[].target`.
-3. `npm run registry:build` → commit `public/r/`. `npm run readme` to refresh the table above.
+A UI component goes in the root manifest; anything else goes in its layer (`registry/{lib,script,config,block,test,starter}/`).
+This procedure ran six times on 2026-07-29/30 and each numbered trap below cost a real debugging round —
+they are listed so the seventh time is cheap.
+
+1. **Put the source in its layer** — `registry/thiengthb/<name>.tsx` for UI (keep the `@/lib/utils` +
+   `@/components/ui/*` imports as in an app), otherwise `registry/<layer>/<file>`.
+2. **Declare it** in that layer's `registry.json` (create the file and add it to the root manifest's
+   `include` if the layer is new): `dependencies` (npm) + `registryDependencies` + `files[].target`.
+   - ⚠️ In an **included** manifest, `files[].path` is relative to **that manifest**, not to the repo root.
+     `registry/lib/db.ts` fails validation there; `db.ts` is correct.
+   - ⚠️ A sibling item must be `@thiengthb/<name>`. Bare `data-pagination` resolves against the DEFAULT
+     shadcn registry and the install fails with "item not found".
+   - To make the item **universal** (installable into a repo with no `components.json` — a config, a script,
+     a CI file), give every file an explicit `~/`-rooted `target` and type `registry:file`.
+3. **Build, regenerate, verify** — `npm run registry:build` → `npm run readme` → `npm run validate`.
+4. **Install it somewhere and RUN it** before believing it. Reviewing a bundle proved nothing: the starter
+   was uninstallable because a devDependency wanted Babel 8 against the shadcn CLI's Babel 7, and npm refused
+   outright. Only `shadcn add` into a scratch app surfaced that.
+   - A **local JSON path cannot resolve `@thiengthb/*` deps** — a multi-item bundle needs the namespaced
+     registry declared in the consumer's `components.json`, and the value must be a real HTTP URL
+     (`file://` returns "not implemented... yet"). For local iteration, serve `public/r` over a throwaway
+     static server.
+   - `--overwrite` is right on a fresh scaffold and **wrong on a living app**: it refetches the shadcn
+     primitives listed as registry deps and will restyle them.
+   - The **executable bit is not preserved**, so a shipped `.sh` arrives `rw-r--r--` — invoke it with `bash`.
+   - A registry item **cannot** merge a script into `package.json`. Anything you ship must call `npx …`, never
+     assume `npm test` exists.
+5. **Commit `public/r/` in the same commit**, and add the row to `platform/registries/shared-assets.md` in that
+   same change (`/code-reuse` law). `data-table` shipped two commits without its own bug fix because step 3
+   was skipped — CI now gates it.
 
 **Only STABLE, product-agnostic things belong here.** Per-app UI (`streak-chip`, `mood-picker`, `day-nav`)
 stays in its app. The gate is `/code-reuse`'s rule of three, with one exemption: an artifact that implements a
