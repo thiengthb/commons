@@ -145,6 +145,11 @@ Recorded so these are not re-litigated:
 This is the running record that `/code-reuse` Step 1c writes to, and the reason the same question is never researched
 twice. **A refusal is a result** — most rows will be refusals, and they are the ones that save the most time later.
 
+**The FOMO brake, stated here because this is the file you have open when you are tempted:** a row costs a line, an
+item costs maintenance forever. **Never pre-build or pre-vendor for software that might be written later** — add the row
+now, and let a real project pull the code when it actually needs it. `commons` stands at 27 proven items and **0
+installs**, which is exactly what the 2026-08-26 check-in measures; padding it makes a null result unreadable.
+
 Keep a row to one line. If the reasoning needs a paragraph, it is a `decisions.md` entry and this row links to it.
 
 | Date       | Looked for                                     | Where it was checked                                         | Verdict                                                                                                          |
