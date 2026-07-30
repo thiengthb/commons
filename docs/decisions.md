@@ -5,6 +5,33 @@
 
 ---
 
+## 2026-07-30 — a verification script whose failure mode is a FALSE PASS must refuse, not guess
+
+**Context:** `rebuild-and-verify.sh` ships from this registry into every repo and ends with a route sweep:
+`for route in $ROUTES`. That relies on the shell word-splitting an unquoted parameter.
+
+**Pitfall:** **bash splits it, zsh and dash do not.** Under zsh, `ROUTES="/ /settings /guide"` stays ONE word, so the
+sweep curls a single nonsense URL, gets a 404, and — depending on the config — can still print a green summary having
+verified nothing. The shebang says bash, but a shebang is advisory: `zsh scripts/rebuild-and-verify.sh` ignores it.
+
+**Decision:** assert `$BASH_VERSION` at the top and **exit 1 with the reason** rather than proceed. Verified by running
+it: zsh, sh and dash all exit 1; bash passes the guard and then fails for the real reason (no app), which proves the
+guard does not false-positive. `todo`'s installed copy had the same unguarded loop and was re-synced (audit: CLEAN).
+`sakubun`'s deliberate fork was checked and has **no** splitting-dependent loop, so it was left alone.
+
+**Why an assertion and not a comment:** for most scripts the wrong shell produces an error and you notice. Here it
+produces a **pass**. A tool whose entire value is being trusted when it says green cannot have a silent-success failure
+mode; the only safe behaviour is refusal. This is the same class as the audit's `selfCheck()` — a check that prints
+nothing on success cannot be distinguished from a check that ran on an empty set.
+
+**How it was found:** not by review. A CI poller written in bash idiom (`set -- $out`) ran 40 pointless iterations under
+zsh because `$1` held the whole line; chasing that bug surfaced the shipped script. The zsh/bash splitting table lives
+in `CLAUDE.local.md` (machine tier — the NUC and the Windows box do not run zsh).
+
+**Related:** `registry/script/rebuild-and-verify.sh:36` · `platform/registries/shared-assets.md` (rebuild-and-verify row)
+
+---
+
 ## 2026-07-30 — external patterns are REFERENCED, not vendored; external RULES are imported
 
 **Context:** the standing request was to find good, generic, reusable patterns _on the web_ — and the

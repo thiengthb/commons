@@ -372,6 +372,30 @@ Answers one falsifiable question: **did the widened registry get used, or did we
 | **1-2 installs** | it works but only where it was pushed | Phase 5 does not start; no new extraction until an existing item gets a 2nd consumer                                                                                                                                               |
 | **0 installs**   | a shelf, not a surface                | **stop extracting.** Freeze the registry at what is proven, mark the deferred list _rejected_, and record in `docs/decisions.md` that the constraint was demand (project count), not supply — the catalog was never the bottleneck |
 
+### Second question, added 2026-07-30: did the OUTSIDE check actually fire?
+
+The "look outside before writing original code" rule was added at three levels that day — `CLAUDE.md` (loaded every
+turn), `/code-reuse` Step 1c, and the verdict log in `docs/external-patterns.md §6`. All three are **prose**. The
+escalation ladder this platform uses is _restructure so compliance is easiest → measure → gate only if prose lost_, so
+this is the measure step, and the gate is deliberately NOT built yet.
+
+1. Count verdict rows added since 2026-07-30:
+   `git -C commons log --since=2026-07-31 -p -- docs/external-patterns.md | grep -c '^+| 20'`
+2. Count feature-ish work that should have triggered it, across the fleet:
+   `for r in projects/*; do git -C $r log --since=2026-07-31 --oneline --grep='^feat' | wc -l; done`
+
+| Result                                | Reading                                       | What it FORBIDS                                                                                                                                                                    |
+| ------------------------------------- | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **rows ≥ 1 per ~3 feat commits**      | the rule fires; prose was enough              | nothing — do NOT add a hook                                                                                                                                                        |
+| **rows ≥ 1 but rare**                 | fires only when remembered                    | no new prose. Restructure once more (put the trigger closer to the write) before considering a gate                                                                                |
+| **0 rows while `feat` commits exist** | **prose lost** — the reflex never changed     | stop restating the rule anywhere. This is the evidence that earns a PreToolUse gate; write it as a proposal (`hooks/**` is human-installed). Note the risk it is noisy and tune it |
+| **0 rows and 0 `feat` commits**       | nothing was built; the rule was never reached | inconclusive — roll `checkin:` forward, do not conclude either way                                                                                                                 |
+
+Pre-committing this because a rule that changes the agent's first move is exactly the kind that gets declared successful
+on the strength of having been written down. It was written down before, in fact: the platform already required ≥2
+external sources — but only via `plan-audit.mjs --hook`, which fires when a **plan file** is written, not when code is.
+That is why the supervisor had to ask twice on 2026-07-30 despite the rule existing.
+
 Close the loop: write the outcome into this plan, then clear `checkin:` (answered) or roll it forward stating what is
 still missing.
 

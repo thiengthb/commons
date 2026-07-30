@@ -78,6 +78,10 @@ Two tools live OUTSIDE this repo because they reason across the whole fleet, not
   a build on Windows (where `core.autocrlf` checks LF blobs out as CRLF) bakes `\r\n` into the artifact and hands
   consumers CRLF files. Measured 2026-07-29: 11 of 15 artifacts carried it. `.gitattributes` (`eol=lf`) is what
   makes the build byte-identical across machines — and therefore gateable in CI.
+- **`script-rebuild-and-verify` asserts `$BASH_VERSION` and refuses otherwise.** Its route sweep is
+  `for route in $ROUTES`, which bash word-splits and **zsh/dash do not** — so under the wrong shell it curls one
+  nonsense URL and can still print green. A shebang is advisory (`zsh script.sh` ignores it), and the one failure mode a
+  verification tool may not have is a silent PASS.
 - **An un-rebuilt edit ships nothing.** `data-table` went two commits (`b06b815`, `171ae18`) with source changes
   that never reached `public/r/data-table.json`, so `shadcn add data-table` kept delivering the old component.
 - **A bare `registryDependency` resolves against the DEFAULT shadcn registry** — `data-pagination` (ours) written
