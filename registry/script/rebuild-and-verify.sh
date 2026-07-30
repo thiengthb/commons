@@ -3,6 +3,13 @@
 # Rebuild a local containerized app and verify it ACTUALLY SERVES. Generic: every app-specific value
 # comes from scripts/verify.conf (or flags), so this file stays byte-identical in every repo.
 #
+# The shebang says bash and it MEANS it — the route sweep below iterates `$ROUTES` unquoted, which is
+# correct in bash and silently wrong in zsh: zsh does not word-split an unquoted parameter, so
+# `ROUTES="/ /settings /guide"` collapses into ONE bogus route, one curl, and a green report that swept
+# nothing. Measured on this platform 2026-07-30 (a poller written in bash idiom ran 40 pointless
+# iterations under zsh because `set -- $out` never split). Hence the assertion, not a comment: the
+# failure mode here is a false PASS, and the only safe version of that is a loud refusal.
+#
 #   bash scripts/rebuild-and-verify.sh                # build, wait for health, sweep routes
 #   bash scripts/rebuild-and-verify.sh --gates        # run lint/test/format first (fail before the build)
 #   bash scripts/rebuild-and-verify.sh --no-build     # compose up without rebuilding, then verify
@@ -27,6 +34,14 @@
 # is bounded, and the exit code reflects the ROUTES, not the build.
 
 set -uo pipefail
+
+# Refuse rather than sweep one bogus route — see the header. `sh script.sh` / `zsh script.sh` ignores the
+# shebang, and this script's whole purpose is to be trusted when it says green.
+if [ -z "${BASH_VERSION:-}" ]; then
+  echo "ERROR: this script must run under bash — it word-splits \$ROUTES, which zsh and dash do not." >&2
+  echo "       Run it as:  bash $0 $*" >&2
+  exit 1
+fi
 
 readonly ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT" || exit 1
